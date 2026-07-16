@@ -141,6 +141,85 @@ def _save_topic_labels(topic_model: Any, output_path: Path) -> None:
     _log(f"[topic-model] Saved topic labels to: {output_path}")
 
 
+def _run_tfidf_kmeans(
+    dataframe: Any,
+    documents: List[str],
+    topic_config: Dict[str, Any],
+    processed_data_dir: Path,
+    output_dir: Path,
+    input_path: Path,
+    cpu_threads: int,
+    heartbeat_seconds: int,
+) -> Path:
+    """Fit a lightweight, deterministic CPU topic model for dashboard builds."""
+    os.environ["LOKY_MAX_CPU_COUNT"] = str(cpu_threads)
+    with _tracked_stage("importing lightweight topic dependencies", heartbeat_seconds):
+        import joblib
+        import yaml
+        from sklearn.cluster import KMeans
+        from sklearn.feature_extraction.text import TfidfVectorizer
+        from threadpoolctl import threadpool_limits
+
+    topic_count = min(
+        int(topic_config.get("topic_count", 24)), max(2, len(documents) // 2)
+    )
+    random_seed = int(topic_config.get("random_seed", 2026))
+    vectorizer = TfidfVectorizer(
+        stop_words="english",
+        ngram_range=(1, 2),
+        min_df=2,
+        max_df=0.9,
+        max_features=12000,
+        sublinear_tf=True,
+    )
+    with _tracked_stage(
+        f"vectorizing {len(documents)} papers with TF-IDF", heartbeat_seconds
+    ):
+        matrix = vectorizer.fit_transform(documents)
+    _log(
+        f"[topic-model] TF-IDF matrix: {matrix.shape[0]} papers x "
+        f"{matrix.shape[1]} terms."
+    )
+
+    cluster_model = KMeans(
+        n_clusters=topic_count,
+        random_state=random_seed,
+        n_init=20,
+        max_iter=500,
+    )
+    with _tracked_stage(
+        f"clustering papers into {topic_count} topics on {cpu_threads} CPU threads",
+        heartbeat_seconds,
+    ):
+        with threadpool_limits(limits=cpu_threads):
+            topics = cluster_model.fit_predict(matrix)
+
+    feature_names = vectorizer.get_feature_names_out()
+    labels: Dict[int, str] = {}
+    for topic_id, center in enumerate(cluster_model.cluster_centers_):
+        top_indices = center.argsort()[-4:][::-1]
+        keywords = [feature_names[index] for index in top_indices if center[index] > 0]
+        label = " / ".join(keywords) or f"Topic {topic_id}"
+        labels[topic_id] = f"{label} · T{topic_id}"
+
+    output_dir.mkdir(parents=True, exist_ok=True)
+    processed_data_dir.mkdir(parents=True, exist_ok=True)
+    output_path = processed_data_dir / f"{input_path.stem}_with_topics.csv"
+    artifact_path = output_dir / f"tfidf_kmeans_{input_path.stem}.joblib"
+    with _tracked_stage("saving lightweight topic-model artifacts", heartbeat_seconds):
+        joblib.dump(
+            {"vectorizer": vectorizer, "cluster_model": cluster_model},
+            artifact_path,
+        )
+        with (output_dir / "topic_labels.yaml").open("w", encoding="utf-8") as file:
+            yaml.safe_dump(labels, file, allow_unicode=True, sort_keys=True)
+        dataframe["Topic"] = topics
+        dataframe.to_csv(output_path, index=False, encoding="utf-8-sig")
+    _log(f"[topic-model] Saved lightweight model to: {artifact_path}")
+    _log(f"[topic-model] Saved topic assignments to: {output_path}")
+    return output_path
+
+
 def main(
     config: Dict[str, Any],
     input_path: Path,
@@ -148,8 +227,9 @@ def main(
     output_dir: Path,
     models_cache_dir: Path,
 ) -> Path:
-    """Fit BERTopic, save the model, labels, and per-paper topic assignments."""
+    """Fit the configured topic backend and save per-paper topic assignments."""
     topic_config = config.get("topic_modeling", {})
+    backend = topic_config.get("backend", "bertopic")
     model_id = topic_config.get(
         "model_id", "sentence-transformers/all-mpnet-base-v2"
     )
@@ -157,6 +237,20 @@ def main(
     embedding_batch_size = topic_config.get("embedding_batch_size", 32)
     heartbeat_seconds = topic_config.get("heartbeat_seconds", 15)
     cpu_threads = _resolve_cpu_threads(topic_config.get("cpu_threads", 0))
+
+    dataframe, documents = load_and_preprocess_data(input_path)
+    if backend == "tfidf_kmeans":
+        _log(f"[topic-model] Backend: TF-IDF + KMeans ({cpu_threads} CPUs).")
+        return _run_tfidf_kmeans(
+            dataframe,
+            documents,
+            topic_config,
+            processed_data_dir,
+            output_dir,
+            input_path,
+            cpu_threads,
+            heartbeat_seconds,
+        )
 
     with _tracked_stage("importing ML dependencies", heartbeat_seconds):
         from bertopic import BERTopic
@@ -166,7 +260,6 @@ def main(
 
     _configure_torch_threads(cpu_threads)
 
-    dataframe, documents = load_and_preprocess_data(input_path)
     effective_min_topic_size = min(min_topic_size, max(2, len(documents) // 2))
     if effective_min_topic_size != min_topic_size:
         _log(

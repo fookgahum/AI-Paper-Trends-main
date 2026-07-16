@@ -20,7 +20,9 @@ venv/
 .coverage
 
 # Data, Models, and Results - Runtime generated, often large
-data/
+data/*
+!data/web/
+!data/web/**
 models/
 results/
 

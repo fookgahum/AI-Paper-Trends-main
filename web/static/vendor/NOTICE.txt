@@ -1,0 +1,6 @@
+Apache ECharts 6.1.0
+https://echarts.apache.org/
+
+Downloaded from the published npm distribution and used under the
+Apache License 2.0. The project license is available at:
+https://github.com/apache/echarts/blob/6.1.0/LICENSE

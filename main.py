@@ -55,6 +55,17 @@ def load_config(config_path: Path) -> Dict[str, Any]:
         raise ValueError("'topic_modeling' must be a mapping.")
     if not isinstance(topic_config.get("enabled", False), bool):
         raise ValueError("'topic_modeling.enabled' must be true or false.")
+    backend = topic_config.get("backend", "bertopic")
+    if backend not in {"bertopic", "tfidf_kmeans"}:
+        raise ValueError(
+            "'topic_modeling.backend' must be 'bertopic' or 'tfidf_kmeans'."
+        )
+    topic_count = topic_config.get("topic_count", 24)
+    if not isinstance(topic_count, int) or topic_count < 2:
+        raise ValueError("'topic_modeling.topic_count' must be at least 2.")
+    random_seed = topic_config.get("random_seed", 2026)
+    if not isinstance(random_seed, int):
+        raise ValueError("'topic_modeling.random_seed' must be an integer.")
     model_id = topic_config.get("model_id", "sentence-transformers/all-mpnet-base-v2")
     if not isinstance(model_id, str) or not model_id.strip():
         raise ValueError("'topic_modeling.model_id' must be a non-empty string.")

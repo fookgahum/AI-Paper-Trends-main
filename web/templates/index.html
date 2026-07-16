@@ -1,0 +1,256 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="Explore public CCF-A conference-paper samples and topic trends.">
+    <title>AI Paper Trends</title>
+    <link rel="stylesheet" href="{{ url_for('static', path='/css/styles.css') }}">
+  </head>
+  <body>
+    <div class="app-shell">
+      <aside class="sidebar" aria-label="Primary navigation">
+        <a class="brand" href="#overview" aria-label="AI Paper Trends home">
+          <span class="brand-mark">AT</span>
+          <span>
+            <strong>AI Paper Trends</strong>
+            <small data-i18n="brandSubtitle">论文趋势分析</small>
+          </span>
+        </a>
+        <nav class="nav-list">
+          <button class="nav-item active" data-section="overview">
+            <span aria-hidden="true">◫</span><span data-i18n="navOverview">总览</span>
+          </button>
+          <button class="nav-item" data-section="topics">
+            <span aria-hidden="true">⌁</span><span data-i18n="navTopics">主题分析</span>
+          </button>
+          <button class="nav-item" data-section="papers">
+            <span aria-hidden="true">▤</span><span data-i18n="navPapers">论文浏览</span>
+          </button>
+          <button class="nav-item" data-section="data">
+            <span aria-hidden="true">◎</span><span data-i18n="navData">数据记录</span>
+          </button>
+          <button class="nav-item" data-section="about">
+            <span aria-hidden="true">i</span><span data-i18n="navAbout">关于</span>
+          </button>
+        </nav>
+        <div class="sidebar-note">
+          <span class="status-dot"></span>
+          <span data-i18n="localReadOnly">本地只读模式</span>
+        </div>
+      </aside>
+
+      <main class="main-content">
+        <header class="topbar">
+          <button class="mobile-menu" id="mobile-menu" aria-label="Toggle navigation">☰</button>
+          <div class="header-title">
+            <span class="eyebrow" data-i18n="dashboardEyebrow">PUBLIC RESEARCH INTELLIGENCE</span>
+            <h1 id="page-title" data-i18n="overviewTitle">会议研究全景</h1>
+          </div>
+          <div class="global-controls">
+            <label>
+              <span data-i18n="dataset">数据集</span>
+              <select id="run-select" aria-label="Dataset"></select>
+            </label>
+            <label>
+              <span data-i18n="conference">会议</span>
+              <select id="conference-select" aria-label="Conference">
+                <option value="" data-i18n="allConferences">全部会议</option>
+              </select>
+            </label>
+            <div class="language-switch" aria-label="Language">
+              <button class="active" data-lang="zh-CN">中文</button>
+              <button data-lang="en-US">EN</button>
+            </div>
+          </div>
+        </header>
+
+        <div id="loading" class="loading-panel">
+          <span class="loading-ring"></span>
+          <span data-i18n="loading">正在读取分析结果…</span>
+        </div>
+        <div id="error-panel" class="error-panel hidden" role="alert"></div>
+
+        <section id="overview" class="page-section active">
+          <div class="scope-banner">
+            <div>
+              <strong data-i18n="scopeTitle">数据范围说明</strong>
+              <p id="scope-note" data-i18n="scopeNote">当前为已录用/已发表论文固定随机样本，不代表全部投稿或真实录用率。</p>
+            </div>
+            <span class="source-badge" data-i18n="officialSources">官方公开来源</span>
+          </div>
+
+          <div class="metric-grid">
+            <article class="metric-card accent-blue">
+              <span data-i18n="paperCount">论文样本</span>
+              <strong id="metric-papers">—</strong>
+              <small data-i18n="paperCountHelp">当前筛选范围</small>
+            </article>
+            <article class="metric-card accent-gold">
+              <span data-i18n="conferenceCount">会议数量</span>
+              <strong id="metric-conferences">—</strong>
+              <small data-i18n="conferenceCountHelp">CCF-A 会议</small>
+            </article>
+            <article class="metric-card accent-olive">
+              <span data-i18n="topicCount">研究主题</span>
+              <strong id="metric-topics">—</strong>
+              <small data-i18n="topicCountHelp">排除离群主题</small>
+            </article>
+            <article class="metric-card accent-pink">
+              <span data-i18n="ratedCount">公开评分覆盖</span>
+              <strong id="metric-rated">—</strong>
+              <small data-i18n="ratedCountHelp">当前来源未公布评分时为 0</small>
+            </article>
+          </div>
+
+          <div class="chart-grid">
+            <article class="panel panel-wide">
+              <div class="panel-heading">
+                <div>
+                  <span class="panel-kicker" data-i18n="ranking">RANKING</span>
+                  <h2 data-i18n="topTopicsTitle">热门研究主题</h2>
+                  <p data-i18n="topTopicsSubtitle">按当前筛选范围内的论文数量排序</p>
+                </div>
+              </div>
+              <div id="topics-chart" class="chart" role="img" aria-label="Top topics chart"></div>
+            </article>
+            <article class="panel">
+              <div class="panel-heading">
+                <div>
+                  <span class="panel-kicker" data-i18n="coverage">COVERAGE</span>
+                  <h2 data-i18n="conferenceMixTitle">会议样本构成</h2>
+                  <p data-i18n="conferenceMixSubtitle">各会议在当前样本中的论文数量</p>
+                </div>
+              </div>
+              <div id="conference-chart" class="chart" role="img" aria-label="Conference count chart"></div>
+            </article>
+            <article class="panel">
+              <div class="panel-heading">
+                <div>
+                  <span class="panel-kicker" data-i18n="outcome">OUTCOME</span>
+                  <h2 data-i18n="decisionTitle">公开发表类型</h2>
+                  <p data-i18n="decisionSubtitle">来源网站提供的录用或发表类别</p>
+                </div>
+              </div>
+              <div id="decision-chart" class="chart" role="img" aria-label="Decision count chart"></div>
+            </article>
+          </div>
+        </section>
+
+        <section id="topics" class="page-section">
+          <div class="section-intro">
+            <div>
+              <span class="eyebrow" data-i18n="topicExplorerEyebrow">TOPIC EXPLORER</span>
+              <h2 data-i18n="topicExplorerTitle">主题对比与下钻</h2>
+              <p data-i18n="topicExplorerSubtitle">比较主题规模，并进入论文列表查看构成。</p>
+            </div>
+          </div>
+          <article class="panel table-panel">
+            <div class="table-scroll">
+              <table>
+                <thead>
+                  <tr>
+                    <th data-i18n="rank">排名</th>
+                    <th data-i18n="topic">主题</th>
+                    <th data-i18n="paperCount">论文样本</th>
+                    <th data-i18n="conferenceDistribution">会议分布</th>
+                    <th><span class="sr-only" data-i18n="actions">操作</span></th>
+                  </tr>
+                </thead>
+                <tbody id="topics-table-body"></tbody>
+              </table>
+            </div>
+          </article>
+        </section>
+
+        <section id="papers" class="page-section">
+          <div class="section-intro">
+            <div>
+              <span class="eyebrow" data-i18n="paperExplorerEyebrow">PAPER EXPLORER</span>
+              <h2 data-i18n="paperExplorerTitle">搜索和筛选论文</h2>
+              <p data-i18n="paperExplorerSubtitle">在标题、作者、关键词和摘要中搜索。</p>
+            </div>
+            <span id="paper-total" class="result-count">—</span>
+          </div>
+          <form id="paper-filters" class="filter-bar">
+            <label class="search-field">
+              <span class="sr-only" data-i18n="search">搜索</span>
+              <input id="paper-search" type="search" data-i18n-placeholder="searchPlaceholder" placeholder="搜索标题、作者、关键词或摘要">
+            </label>
+            <label>
+              <span class="sr-only" data-i18n="topic">主题</span>
+              <select id="topic-filter"><option value="" data-i18n="allTopics">全部主题</option></select>
+            </label>
+            <label>
+              <span class="sr-only" data-i18n="decision">类型</span>
+              <select id="decision-filter"><option value="" data-i18n="allDecisions">全部类型</option></select>
+            </label>
+            <label>
+              <span class="sr-only" data-i18n="sort">排序</span>
+              <select id="paper-sort">
+                <option value="title" data-i18n="sortTitle">按标题</option>
+                <option value="conference" data-i18n="sortConference">按会议</option>
+                <option value="topic" data-i18n="sortTopic">按主题</option>
+                <option value="rating" data-i18n="sortRating">按评分</option>
+              </select>
+            </label>
+            <button class="primary-button" type="submit" data-i18n="applyFilters">应用筛选</button>
+          </form>
+          <div id="paper-list" class="paper-list"></div>
+          <div class="pagination">
+            <button id="previous-page" class="secondary-button" data-i18n="previous">上一页</button>
+            <span id="page-status">—</span>
+            <button id="next-page" class="secondary-button" data-i18n="next">下一页</button>
+          </div>
+        </section>
+
+        <section id="data" class="page-section">
+          <div class="section-intro">
+            <div>
+              <span class="eyebrow" data-i18n="provenanceEyebrow">DATA PROVENANCE</span>
+              <h2 data-i18n="provenanceTitle">数据来源和生成记录</h2>
+              <p data-i18n="provenanceSubtitle">每项结果均保留会议、样本和公开来源信息。</p>
+            </div>
+          </div>
+          <div id="run-details" class="provenance-grid"></div>
+          <article class="panel table-panel">
+            <div class="table-scroll">
+              <table>
+                <thead>
+                  <tr>
+                    <th data-i18n="conference">会议</th>
+                    <th data-i18n="source">来源</th>
+                    <th data-i18n="paperCount">论文样本</th>
+                    <th data-i18n="scope">范围</th>
+                  </tr>
+                </thead>
+                <tbody id="sources-table-body"></tbody>
+              </table>
+            </div>
+          </article>
+        </section>
+
+        <section id="about" class="page-section">
+          <article class="about-card">
+            <span class="eyebrow">AI PAPER TRENDS</span>
+            <h2 data-i18n="aboutTitle">关于这个网站</h2>
+            <p data-i18n="aboutBody">本网站用于浏览公开会议论文样本、主题聚类结果和来源元数据。它是只读展示层，打开网页不会启动模型训练。</p>
+            <div class="about-points">
+              <div><strong data-i18n="readOnly">只读</strong><span data-i18n="readOnlyDetail">不会修改分析数据</span></div>
+              <div><strong data-i18n="offlineCharts">本地图表</strong><span data-i18n="offlineChartsDetail">图表资源随项目提供</span></div>
+              <div><strong data-i18n="bilingual">双语</strong><span data-i18n="bilingualDetail">中文和英文界面</span></div>
+            </div>
+          </article>
+        </section>
+      </main>
+    </div>
+
+    <dialog id="paper-dialog" class="paper-dialog">
+      <button id="dialog-close" class="dialog-close" aria-label="Close">×</button>
+      <div id="paper-dialog-content"></div>
+    </dialog>
+
+    <script src="{{ url_for('static', path='/vendor/echarts.min.js') }}"></script>
+    <script src="{{ url_for('static', path='/js/app.js') }}"></script>
+  </body>
+</html>

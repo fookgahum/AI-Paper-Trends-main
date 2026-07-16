@@ -2,49 +2,24 @@
 
 # AI 论文趋势分析
 
-[![Python 3.10+](https://img.shields.io/badge/python-3.10+-blue.svg)](https://www.python.org/downloads/) [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+AI Paper Trends 是一个本地运行的计算机会议论文分析网站与可复现数据流水线。它可以获取 OpenReview 公开论文、导入指定会议的官方论文集、构建研究主题、生成统计报告，并通过中英双语只读网站展示结果。
 
-AI Paper Trends 是一条配置驱动的会议论文趋势分析流水线。它从 OpenReview 获取公开投稿、评审和录用决定，使用 BERTopic 聚类研究主题，最后生成主题热度、评分、录用情况、图表和汇总表。
+## 当前功能
 
-## 当前能做什么
+- 获取 OpenReview 公开的论文元数据；会议公开时还可读取决定和评分。
+- 支持原有 BERTopic 后端，以及快速、可复现的 TF-IDF + KMeans 纯 CPU 后端。
+- 在耗时建模阶段持续输出进度心跳，用于区分正常运行和卡住。
+- 为 OpenReview 数据生成主题、评分、决定构成、CSV、HTML 和图片报告。
+- 在网站中按会议、主题和发表类型筛选，搜索标题/作者/关键词/摘要，查看图表、论文详情和官方来源。
+- 从 ICLR、ICML、ACL 官方来源重新生成仓库内的 2026 年数据。
 
-1. 获取指定 OpenReview 会场的公开投稿。
-2. 可选地在同一批请求中读取公开评审、分数和最终决定。
-3. 合并标题、关键词和摘要，形成主题建模文本。
-4. 使用 Sentence Transformer 和 BERTopic 分配研究主题。
-5. 根据主题关键词自动生成可读标签。
-6. 输出论文数量排名、平均评分排名、录用构成图以及 CSV/HTML 汇总表。
+## 仓库内的 2026 网站数据
 
-仓库内配置覆盖使用 OpenReview 的 ICLR、ICML、NeurIPS 和 CVPR 部分年份。目前尚未直接接入 ACM DL、IEEE Xplore、CVF Open Access、PMLR、ACL Anthology 等其他论文库。
+网站快照共 600 篇：ICLR 2026、ICML 2026、ACL 2026 各从官方公开的已录用或已发表论文中，以固定随机种子 `2026` 抽样 200 篇。截至 2026-07-17，NeurIPS 2026 官方投稿页没有可公开论文，因此第三个真实的 CCF-A 会议采用 ACL 2026。这不是全部投稿样本，不能用于估算真实录用率。
 
-## 示例结果
+## 启动网站
 
-![主题热度](docs/images/1.png)
-![录用构成](docs/images/2.png)
-![主题评分](docs/images/3.png)
-![汇总表](docs/images/4.png)
-
-## 项目结构
-
-```text
-.
-├── configs/                 # 可直接运行的会议配置
-├── data/                    # 原始和处理后数据（Git 忽略）
-├── docs/images/             # README 示例图片
-├── models/                  # 下载的嵌入模型（Git 忽略）
-├── results/                 # 模型、标签、图表和表格（Git 忽略）
-├── src/
-│   ├── analyze.py           # 统计和可视化
-│   ├── get_papers.py        # OpenReview 数据获取
-│   └── run_topic_modeling.py# BERTopic 建模和主题标签
-├── tests/                   # 轻量单元测试
-├── main.py                  # 命令行主入口
-└── requirements.txt
-```
-
-## 安装
-
-推荐使用 Python 3.10 或更高版本，并创建独立虚拟环境。
+推荐使用 Python 3.10 或更高版本：
 
 ```powershell
 python -m venv .venv
@@ -53,76 +28,76 @@ python -m pip install --upgrade pip
 pip install -r requirements.txt
 ```
 
-PyTorch 等模型依赖体积较大，第一次安装和下载模型需要一定时间和磁盘空间。
+启动本地服务：
 
-## 运行
+```powershell
+python -m uvicorn web.app:app --host 127.0.0.1 --port 8000
+```
+
+浏览器打开 `http://127.0.0.1:8000`。不需要安装 Docker。打开网站只会读取 `data/web/` 中已提交的结果，不会自动开始训练。
+
+## 重新生成 2026 数据
+
+完整命令会下载官方公开元数据、每个会议抽样 200 篇、在 CPU 上生成 24 个固定主题，并导出网站数据：
+
+```powershell
+python -u -m scripts.build_2026_dashboard
+```
+
+复用已下载样本，或同时复用已生成的主题结果：
+
+```powershell
+python -u -m scripts.build_2026_dashboard --skip-fetch
+python -u -m scripts.build_2026_dashboard --skip-fetch --skip-model
+```
+
+原始数据、处理中间文件和模型产物由 Git 忽略；仓库只提交体积较小、供网站读取的最终快照。
+
+## 运行 OpenReview 分析
 
 ```powershell
 python main.py --config configs/iclr_2025_full_analysis.yaml
 ```
 
-默认会复用已有原始数据和主题结果。强制重新抓取与建模：
+添加 `--force-rerun` 可以忽略缓存。如果 OpenReview 限制匿名访问，可以通过进程环境变量提供 `OPENREVIEW_USERNAME` 与 `OPENREVIEW_PASSWORD`，不要把账号密码提交到 Git。
 
-```powershell
-python main.py --config configs/iclr_2025_full_analysis.yaml --force-rerun
-```
-
-如果 OpenReview 阻止匿名自动访问，可以先通过环境变量提供 OpenReview 账号：
-
-```powershell
-$env:OPENREVIEW_USERNAME="your-email@example.com"
-$env:OPENREVIEW_PASSWORD="your-password"
-python main.py --config configs/iclr_2025_full_analysis.yaml --force-rerun
-```
-
-不要把账号密码提交到 Git。仓库会忽略 `.env`，程序直接读取当前进程的环境变量。
-
-## 配置说明
+主题建模的主要配置如下：
 
 ```yaml
-conference_id: ICLR.cc/2025/Conference
-fetch_reviews: true
-limit: null
-
 topic_modeling:
   enabled: true
-  model_id: sentence-transformers/all-mpnet-base-v2
-  min_topic_size: 30
+  backend: bertopic          # 或 tfidf_kmeans
+  min_topic_size: 30         # BERTopic 后端使用
+  topic_count: 24            # TF-IDF + KMeans 后端使用
+  random_seed: 2026
   embedding_batch_size: 32
-  cpu_threads: 0
+  cpu_threads: 0             # 0 表示使用全部逻辑核心
   heartbeat_seconds: 15
-
-analysis:
-  enabled: true
-  top_n: 65
-  tasks:
-    - plot_paper_count
-    - plot_avg_rating
-    - plot_decision_breakdown
-    - generate_summary_table
-
-output_folder_name: iclr_2025_analysis
 ```
 
-- `conference_id`：OpenReview 上准确的公开会场 ID。
-- `fetch_reviews`：是否读取公开决定和评分。关闭后仍可分析主题数量，但没有评分和录用率。
-- `limit`：用于快速测试的论文上限；`null` 表示全部论文。
-- `model_id`：ModelScope 可下载的 Sentence Transformer 模型 ID。
-- `min_topic_size`：BERTopic 最小主题规模，小样本测试时会自动调低。
-- `embedding_batch_size`：每批编码的论文数；内存不足时可以调低。
-- `cpu_threads`：PyTorch、UMAP 和 HDBSCAN 使用的 CPU 线程数；`0` 表示自动使用全部逻辑核心。
-- `heartbeat_seconds`：机器学习耗时阶段的心跳输出间隔，用于区分运行中和卡住。
-- `top_n`：每份图表和汇总表最多显示多少个主题。
+## 项目结构
 
-`data/`、`models/` 和 `results/` 是运行产物，可能达到数百 MB，因此不会提交到 Git。
+```text
+configs/                  分析与网站数据配置
+data/web/                 提交到 Git 的只读网站快照
+docs/images/              静态分析示例图
+scripts/                  2026 官方数据导入、建模与导出命令
+src/get_papers.py         OpenReview 数据获取
+src/run_topic_modeling.py BERTopic 与轻量 CPU 主题后端
+src/analyze.py            统计报告与静态图表
+tests/                    单元测试和 HTTP 集成测试
+web/                      FastAPI、模板、样式、脚本和 ECharts
+main.py                   OpenReview 流水线入口
+```
 
 ## 验证
 
 ```powershell
 python -m unittest discover -s tests -v
-python -m compileall -q main.py src tests
+python -m compileall -q main.py src scripts web tests
+node --check web/static/js/app.js
 ```
 
 ## 许可证
 
-项目使用 [MIT License](LICENSE)。
+项目使用 [MIT License](LICENSE)。内置 Apache ECharts 使用 Apache License 2.0，详见 `web/static/vendor/NOTICE.txt`。

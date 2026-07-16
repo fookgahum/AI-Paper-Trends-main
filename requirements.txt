@@ -8,6 +8,7 @@ sentence-transformers
 umap-learn
 hdbscan
 modelscope
+scikit-learn
 
 # Analysis, configuration, and reports
 pandas
@@ -15,3 +16,10 @@ matplotlib
 seaborn
 PyYAML
 Jinja2
+
+# Local web dashboard and public proceedings import
+fastapi
+uvicorn
+requests
+beautifulsoup4
+httpx

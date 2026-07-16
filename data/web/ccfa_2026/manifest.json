@@ -1,0 +1,43 @@
+{
+  "run_id": "ccfa_2026",
+  "title": "CCF-A 2026 · 600-paper topic sample",
+  "year": 2026,
+  "generated_at": "2026-07-16T18:55:00.568542+00:00",
+  "sample_seed": 2026,
+  "sample_size_per_conference": 200,
+  "sample_scope": "accepted_or_published",
+  "scope_note": {
+    "zh-CN": "截至 2026-07-17，NeurIPS 2026 官方投稿页尚无公开论文，因此第三个真实来源采用 ACL 2026。ICLR、ICML、ACL 各从官方已录用/已发表论文中固定随机抽取 200 篇，共 600 篇；它不是全部投稿样本，不能用于计算真实录用率。",
+    "en-US": "As of 2026-07-17, the official NeurIPS 2026 submission page exposes no papers, so ACL 2026 is the third real source. This fixed sample contains 200 accepted or published papers from each official ICLR, ICML, and ACL source (600 total); it cannot support a true acceptance-rate estimate."
+  },
+  "source_checked_at": "2026-07-17",
+  "metrics_availability": {
+    "public_review_rating": false,
+    "acceptance_rate": false
+  },
+  "topic_model": "TF-IDF (1-2 grams) + KMeans, 24 topics, random seed 2026",
+  "paper_count": 600,
+  "sources": [
+    {
+      "conference": "ICLR",
+      "label": "ICLR 2026 official virtual program",
+      "url": "https://iclr.cc/virtual/2026/papers.html",
+      "scope": "Accepted program papers · fixed random sample",
+      "paper_count": 200
+    },
+    {
+      "conference": "ICML",
+      "label": "ICML 2026 official virtual program",
+      "url": "https://icml.cc/virtual/2026/papers.html",
+      "scope": "Accepted program papers · fixed random sample",
+      "paper_count": 200
+    },
+    {
+      "conference": "ACL",
+      "label": "ACL 2026 official ACL Anthology proceedings",
+      "url": "https://aclanthology.org/events/acl-2026/",
+      "scope": "Published long papers · fixed random sample",
+      "paper_count": 200
+    }
+  ]
+}

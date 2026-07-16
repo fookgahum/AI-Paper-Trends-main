@@ -2,128 +2,102 @@
 
 # AI Paper Trends
 
-[![Python 3.10+](https://img.shields.io/badge/python-3.10+-blue.svg)](https://www.python.org/downloads/) [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+AI Paper Trends is a local research dashboard and reproducible analysis pipeline for public computer-science conference papers. It can fetch public OpenReview submissions, import selected official 2026 proceedings, build topic models, generate reports, and serve the exported results through a bilingual read-only website.
 
-AI Paper Trends is a configuration-driven pipeline for finding research-topic trends in public OpenReview conference submissions. It fetches paper metadata and public reviews, clusters papers with BERTopic, then produces topic rankings, acceptance statistics, charts, and summary tables.
+## Current capabilities
 
-## What the pipeline does
+- Fetch public OpenReview paper metadata, decisions, and ratings when the venue exposes them.
+- Build topics with the original BERTopic backend or the fast deterministic TF-IDF + KMeans CPU backend.
+- Emit progress heartbeats around long-running model stages.
+- Generate topic, rating, decision, CSV, HTML, and image reports for OpenReview runs.
+- Browse exported results in Chinese or English, with conference/topic/type filters, full-text search, charts, paper details, and official source links.
+- Rebuild the included 2026 dataset from official ICLR, ICML, and ACL sources.
 
-1. Fetches public submissions from an OpenReview venue.
-2. Optionally extracts public decisions and reviewer ratings in the same batched request.
-3. Builds text from each paper's title, keywords, and abstract.
-4. Assigns BERTopic topics using a cached Sentence Transformer model.
-5. Generates readable keyword labels for each topic.
-6. Produces paper-count and rating rankings, decision-composition charts, and CSV/HTML summaries.
+## Included 2026 web dataset
 
-The included configurations cover ICLR, ICML, NeurIPS, and CVPR editions that use OpenReview. This project does not currently ingest proceedings from ACM DL, IEEE Xplore, CVF Open Access, PMLR, ACL Anthology, or other sources.
+The tracked web snapshot contains 600 papers: a fixed random sample of 200 accepted or published papers from each official ICLR 2026, ICML 2026, and ACL 2026 source (seed `2026`). As of 2026-07-17, the official NeurIPS 2026 submission page exposes no papers, so ACL is used as the third real CCF-A venue. This sample is not a submission population and must not be used to estimate acceptance rates.
 
-## Example output
+## Start the website
 
-![Topic ranking](docs/images/1.png)
-![Decision breakdown](docs/images/2.png)
-![Rating ranking](docs/images/3.png)
-![Summary table](docs/images/4.png)
+Install Python 3.10 or newer and the dependencies:
 
-## Project structure
-
-```text
-.
-├── configs/                 # Ready-to-run conference configurations
-├── data/                    # Runtime raw and processed data (Git ignored)
-├── docs/images/             # README examples
-├── models/                  # Downloaded embedding models (Git ignored)
-├── results/                 # Models, labels, charts, and tables (Git ignored)
-├── src/
-│   ├── analyze.py           # Statistics and visualizations
-│   ├── get_papers.py        # OpenReview API ingestion
-│   └── run_topic_modeling.py# BERTopic training and topic labels
-├── tests/                   # Lightweight unit tests
-├── main.py                  # Command-line pipeline
-└── requirements.txt
-```
-
-## Installation
-
-Python 3.10 or newer is recommended. Creating a virtual environment is strongly encouraged.
-
-```bash
+```powershell
 python -m venv .venv
-# Windows PowerShell
 .\.venv\Scripts\Activate.ps1
 python -m pip install --upgrade pip
 pip install -r requirements.txt
 ```
 
-Model dependencies such as PyTorch are large, so the first installation and first model download can take time and disk space.
+Start the local server:
 
-## Run an analysis
+```powershell
+python -m uvicorn web.app:app --host 127.0.0.1 --port 8000
+```
 
-```bash
+Open `http://127.0.0.1:8000`. Docker is not required. Opening the website never starts model training; it only reads the committed files in `data/web/`.
+
+## Rebuild the 2026 dataset
+
+The full workflow downloads official public metadata, samples 200 papers per venue, builds 24 deterministic topics on CPU, and exports the web snapshot:
+
+```powershell
+python -u -m scripts.build_2026_dashboard
+```
+
+Reuse the downloaded sample or both the sample and trained topic output:
+
+```powershell
+python -u -m scripts.build_2026_dashboard --skip-fetch
+python -u -m scripts.build_2026_dashboard --skip-fetch --skip-model
+```
+
+Raw data, processed CSV files, and model artifacts remain Git-ignored. Only the compact read-only web export is committed.
+
+## Run an OpenReview analysis
+
+```powershell
 python main.py --config configs/iclr_2025_full_analysis.yaml
 ```
 
-Use cached raw data and topic assignments by default. To fetch and model everything again:
+Add `--force-rerun` to ignore cached raw/topic files. If anonymous OpenReview access is challenged, provide `OPENREVIEW_USERNAME` and `OPENREVIEW_PASSWORD` through process environment variables; never commit credentials.
 
-```bash
-python main.py --config configs/iclr_2025_full_analysis.yaml --force-rerun
-```
-
-If OpenReview blocks anonymous automated access, provide your OpenReview credentials through environment variables before running:
-
-```powershell
-$env:OPENREVIEW_USERNAME="your-email@example.com"
-$env:OPENREVIEW_PASSWORD="your-password"
-python main.py --config configs/iclr_2025_full_analysis.yaml --force-rerun
-```
-
-Do not commit credentials. The repository ignores `.env`, but the application reads the process environment directly.
-
-## Configuration
+Key topic-model options are:
 
 ```yaml
-conference_id: ICLR.cc/2025/Conference
-fetch_reviews: true
-limit: null
-
 topic_modeling:
   enabled: true
-  model_id: sentence-transformers/all-mpnet-base-v2
-  min_topic_size: 30
+  backend: bertopic          # or tfidf_kmeans
+  min_topic_size: 30         # BERTopic backend
+  topic_count: 24            # TF-IDF + KMeans backend
+  random_seed: 2026
   embedding_batch_size: 32
-  cpu_threads: 0
+  cpu_threads: 0             # 0 = all logical CPUs
   heartbeat_seconds: 15
-
-analysis:
-  enabled: true
-  top_n: 65
-  tasks:
-    - plot_paper_count
-    - plot_avg_rating
-    - plot_decision_breakdown
-    - generate_summary_table
-
-output_folder_name: iclr_2025_analysis
 ```
 
-- `conference_id`: exact public OpenReview venue ID.
-- `fetch_reviews`: include public decisions and ratings. When disabled, volume analysis still works; rating and acceptance metrics remain unavailable.
-- `limit`: positive integer for a quick run, or `null` for every submission.
-- `model_id`: ModelScope-compatible Sentence Transformer ID.
-- `min_topic_size`: BERTopic minimum cluster size, automatically reduced for small test runs.
-- `embedding_batch_size`: papers encoded per batch; reduce it if memory is limited.
-- `cpu_threads`: CPU worker threads used by PyTorch, UMAP, and HDBSCAN; `0` uses all logical CPUs.
-- `heartbeat_seconds`: interval for live progress messages during long-running ML stages.
-- `top_n`: maximum number of topics in each report.
+## Project structure
 
-Runtime outputs are intentionally excluded from Git because raw conference data and model files can be hundreds of megabytes.
+```text
+configs/                  Analysis and web-dataset configurations
+data/web/                 Committed read-only dashboard snapshots
+docs/images/              Example analysis output
+scripts/                  Official 2026 import/build/export commands
+src/get_papers.py         OpenReview ingestion
+src/run_topic_modeling.py BERTopic and lightweight CPU topic backends
+src/analyze.py            Statistical reports and static charts
+tests/                    Unit and HTTP integration tests
+web/                      FastAPI API, templates, CSS, JavaScript, ECharts
+main.py                   OpenReview pipeline entry point
+```
 
-## Test
+## Verify
 
-```bash
+```powershell
 python -m unittest discover -s tests -v
-python -m compileall -q main.py src tests
+python -m compileall -q main.py src scripts web tests
+node --check web/static/js/app.js
 ```
 
 ## License
 
-Released under the [MIT License](LICENSE).
+Released under the [MIT License](LICENSE). Apache ECharts is included under the Apache License 2.0; see `web/static/vendor/NOTICE.txt`.

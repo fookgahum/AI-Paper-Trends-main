@@ -68,6 +68,18 @@ analysis:
             with self.assertRaisesRegex(ValueError, "Unsupported analysis tasks"):
                 main.load_config(path)
 
+    def test_load_config_rejects_unknown_topic_backend(self) -> None:
+        content = """
+conference_id: ICLR.cc/2025/Conference
+topic_modeling:
+  backend: unknown
+"""
+        with tempfile.TemporaryDirectory() as directory:
+            path = Path(directory) / "config.yaml"
+            path.write_text(content, encoding="utf-8")
+            with self.assertRaisesRegex(ValueError, "topic_modeling.backend"):
+                main.load_config(path)
+
 
 class PaperExtractionTests(unittest.TestCase):
     def test_extracts_nested_content_reviews_and_decision(self) -> None:
@@ -195,6 +207,51 @@ class TopicModelingTests(unittest.TestCase):
 
         self.assertIn("keywords", processed.columns)
         self.assertEqual(documents, ["First. . Alpha", "Second. . Beta"])
+
+    def test_lightweight_backend_writes_topics_and_labels(self) -> None:
+        dataframe = pd.DataFrame(
+            [
+                {
+                    "id": f"graph-{index}",
+                    "title": "Graph model",
+                    "abstract": "Graph node edge learning",
+                }
+                for index in range(3)
+            ]
+            + [
+                {
+                    "id": f"language-{index}",
+                    "title": "Language model",
+                    "abstract": "Text token language generation",
+                }
+                for index in range(3)
+            ]
+        )
+        config = {
+            "topic_modeling": {
+                "backend": "tfidf_kmeans",
+                "topic_count": 2,
+                "random_seed": 2026,
+                "cpu_threads": 1,
+                "heartbeat_seconds": 60,
+            }
+        }
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            input_path = root / "papers.jsonl"
+            dataframe.to_json(input_path, orient="records", lines=True)
+            output_path = run_topic_modeling.main(
+                config,
+                input_path,
+                root / "processed",
+                root / "results",
+                root / "models",
+            )
+            processed = pd.read_csv(output_path, encoding="utf-8-sig")
+            labels_path = root / "results" / "topic_labels.yaml"
+
+            self.assertTrue(labels_path.exists())
+            self.assertEqual(set(processed["Topic"]), {0, 1})
 
 
 if __name__ == "__main__":
