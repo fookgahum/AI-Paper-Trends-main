@@ -33,22 +33,18 @@ def _tracked_stage(name: str, heartbeat_seconds: int) -> Iterator[None]:
         daemon=True,
     )
     reporter.start()
+    succeeded = False
     try:
         yield
-    except BaseException:
-        _log(
-            f"[topic-model] FAILED: {name} after "
-            f"{perf_counter() - started:.1f}s."
-        )
-        raise
-    else:
-        _log(
-            f"[topic-model] DONE: {name} in "
-            f"{perf_counter() - started:.1f}s."
-        )
+        succeeded = True
     finally:
         stopped.set()
         reporter.join(timeout=1)
+        status = "DONE" if succeeded else "FAILED"
+        _log(
+            f"[topic-model] {status}: {name} in "
+            f"{perf_counter() - started:.1f}s."
+        )
 
 
 def _resolve_cpu_threads(configured_threads: int) -> int:
@@ -115,12 +111,12 @@ def load_and_preprocess_data(file_path: Path) -> Tuple[Any, List[str]]:
 
 def download_embedding_model(model_id: str, cache_dir: Path) -> Path:
     """Download a ModelScope snapshot when it is not already cached."""
-    from modelscope.hub.snapshot_download import snapshot_download
-
     expected_path = cache_dir / model_id
     if expected_path.exists():
         _log(f"[topic-model] Using cached embedding model: {expected_path}")
         return expected_path
+
+    from modelscope.hub.snapshot_download import snapshot_download
 
     cache_dir.mkdir(parents=True, exist_ok=True)
     _log(f"[topic-model] Downloading embedding model: {model_id}")

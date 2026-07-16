@@ -102,22 +102,15 @@ def _extract_paper(note: Any, fetch_reviews: bool) -> Dict[str, Any]:
 
 def _submission_invitation(client: openreview.api.OpenReviewClient, conference_id: str) -> str:
     """Resolve the venue's submission invitation, with common-name fallbacks."""
-    candidates: List[str] = []
     try:
         venue_group = client.get_group(conference_id)
         submission_name = _content_value(venue_group.content, "submission_name")
         if submission_name:
-            candidates.append(f"{conference_id}/-/{submission_name}")
+            return f"{conference_id}/-/{submission_name}"
     except Exception as error:
         print(f"Could not read venue metadata; trying standard invitations: {error}")
 
-    candidates.extend(
-        [
-            f"{conference_id}/-/Submission",
-            f"{conference_id}/-/Blind_Submission",
-        ]
-    )
-    return next(iter(dict.fromkeys(candidates)))
+    return f"{conference_id}/-/Submission"
 
 
 def get_all_papers(
