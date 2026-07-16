@@ -1,0 +1,17 @@
+# OpenReview ingestion
+openreview-py
+tqdm
+
+# Topic modeling
+bertopic
+sentence-transformers
+umap-learn
+hdbscan
+modelscope
+
+# Analysis, configuration, and reports
+pandas
+matplotlib
+seaborn
+PyYAML
+Jinja2

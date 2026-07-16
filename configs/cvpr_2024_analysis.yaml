@@ -1,0 +1,17 @@
+conference_id: thecvf.com/CVPR/2024/Conference
+fetch_reviews: true
+limit: null
+
+topic_modeling:
+  enabled: true
+  min_topic_size: 30
+
+analysis:
+  enabled: true
+  tasks:
+    - plot_paper_count
+    - plot_avg_rating
+    - plot_decision_breakdown
+    - generate_summary_table
+
+output_folder_name: cvpr_2024_analysis
