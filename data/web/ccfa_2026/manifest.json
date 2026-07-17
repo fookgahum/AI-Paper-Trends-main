@@ -1,8 +1,8 @@
 {
   "run_id": "ccfa_2026",
-  "title": "CCF-A 2026 · 600-paper topic sample",
+  "title": "CCF-A 2026 · 600-paper frontier sample",
   "year": 2026,
-  "generated_at": "2026-07-16T18:55:00.568542+00:00",
+  "generated_at": "2026-07-17T17:26:30.978579+00:00",
   "sample_seed": 2026,
   "sample_size_per_conference": 200,
   "sample_scope": "accepted_or_published",
@@ -39,5 +39,12 @@
       "scope": "Published long papers · fixed random sample",
       "paper_count": 200
     }
-  ]
+  ],
+  "frontier_analysis": {
+    "file": "opportunities.json",
+    "direction_count": 13,
+    "default_profile": "individual",
+    "score_is_acceptance_probability": false,
+    "method": "curated direction synthesis with reproducible evidence metrics"
+  }
 }

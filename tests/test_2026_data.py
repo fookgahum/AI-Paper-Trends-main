@@ -89,12 +89,54 @@ class WebExportTests(unittest.TestCase):
         )
         conference_counts = Counter(paper["conference"] for paper in papers)
         topic_counts = Counter(paper["topic_id"] for paper in papers)
+        opportunities = json.loads(
+            (
+                PROJECT_ROOT
+                / "data"
+                / "web"
+                / "ccfa_2026"
+                / "opportunities.json"
+            ).read_text(encoding="utf-8")
+        )
+        directions = opportunities["directions"]
 
         self.assertEqual(dashboard["overview"]["paper_count"], 600)
         self.assertEqual(conference_counts, {"ICLR": 200, "ICML": 200, "ACL": 200})
         self.assertEqual(len(topic_counts), 24)
         self.assertLessEqual(max(topic_counts.values()), 100)
         self.assertGreaterEqual(min(topic_counts.values()), 5)
+        self.assertEqual(len(directions), 13)
+        self.assertEqual(sum(item["paper_count"] for item in directions), 600)
+        self.assertEqual(
+            {topic for item in directions for topic in item["topic_ids"]},
+            set(topic_counts),
+        )
+        self.assertEqual(
+            {paper["direction_id"] for paper in papers},
+            {item["id"] for item in directions},
+        )
+        self.assertTrue(
+            all(
+                0 <= score["score"] <= 100
+                for item in directions
+                for score in item["scores"].values()
+            )
+        )
+        self.assertTrue(
+            all(
+                isinstance(item["title"]["zh-CN"], str)
+                and isinstance(item["title"]["en-US"], str)
+                for item in directions
+            )
+        )
+        self.assertTrue(
+            all(
+                len(item["entry_points"][language]) == 3
+                for item in directions
+                for language in ("zh-CN", "en-US")
+            )
+        )
+        self.assertEqual(len(opportunities["limitations"]["zh-CN"]), 4)
 
 
 if __name__ == "__main__":

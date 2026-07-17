@@ -6,6 +6,7 @@ import argparse
 from pathlib import Path
 
 import main as pipeline
+from scripts.build_frontier_opportunities import build_opportunity_snapshot
 from scripts.export_web_data import export_snapshot
 from scripts.fetch_2026_samples import fetch_samples, write_jsonl
 from src import run_topic_modeling
@@ -74,6 +75,9 @@ def main() -> int:
         topic_model=(
             "TF-IDF (1-2 grams) + KMeans, 24 topics, random seed 2026"
         ),
+    )
+    build_opportunity_snapshot(
+        WEB_DIR, PROJECT_ROOT / "configs" / "frontier" / "directions.yaml"
     )
     print("[2026-build] Dashboard dataset is ready.", flush=True)
     return 0

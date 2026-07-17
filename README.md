@@ -10,12 +10,16 @@ AI Paper Trends is a local research dashboard and reproducible analysis pipeline
 - Build topics with the original BERTopic backend or the fast deterministic TF-IDF + KMeans CPU backend.
 - Emit progress heartbeats around long-running model stages.
 - Generate topic, rating, decision, CSV, HTML, and image reports for OpenReview runs.
-- Browse exported results in Chinese or English, with conference/topic/type filters, full-text search, charts, paper details, and official source links.
+- Synthesize 24 base clusters into 13 readable frontier directions with research summaries, timely open questions, practical paper entry points, and commoditization warnings.
+- Rank entry friendliness for individual, standard-lab, theory-strong, and resource-rich profiles while exposing compute, data, engineering, and theory barriers.
+- Drill from each recommendation into representative and supporting papers, filter by venue/direction/base topic/type, and verify against official source links.
 - Rebuild the included 2026 dataset from official ICLR, ICML, and ACL sources.
 
 ## Included 2026 web dataset
 
-The tracked web snapshot contains 600 papers: a fixed random sample of 200 accepted or published papers from each official ICLR 2026, ICML 2026, and ACL 2026 source (seed `2026`). As of 2026-07-17, the official NeurIPS 2026 submission page exposes no papers, so ACL is used as the third real CCF-A venue. This sample is not a submission population and must not be used to estimate acceptance rates.
+The tracked web snapshot contains 600 papers: a fixed random sample of 200 accepted or published papers from each official ICLR 2026, ICML 2026, and ACL 2026 source (seed `2026`). As of 2026-07-17, the official NeurIPS 2026 submission page exposes no papers, so ACL is used as the third real CCF-A venue.
+
+The website's entry-friendliness score combines resource fit, cross-venue breadth, evaluation-oriented entry signals, evidence volume, and competition headroom. It is a topic-selection heuristic, not an acceptance probability. The snapshot contains one year of accepted/published work and cannot reveal submission volume, rejected-work distributions, or multi-year momentum.
 
 ## Start the website
 
@@ -38,7 +42,7 @@ Open `http://127.0.0.1:8000`. Docker is not required. Opening the website never 
 
 ## Rebuild the 2026 dataset
 
-The full workflow downloads official public metadata, samples 200 papers per venue, builds 24 deterministic topics on CPU, and exports the web snapshot:
+The full workflow downloads official public metadata, samples 200 papers per venue, builds 24 deterministic base topics on CPU, synthesizes 13 frontier directions with evidence metrics, and exports the web snapshot:
 
 ```powershell
 python -u -m scripts.build_2026_dashboard

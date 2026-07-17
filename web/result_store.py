@@ -20,6 +20,7 @@ class RunSnapshot:
 
     manifest: Dict[str, Any]
     papers: List[Dict[str, Any]]
+    opportunities: Dict[str, Any]
 
 
 class ResultStore:
@@ -27,7 +28,7 @@ class ResultStore:
 
     def __init__(self, data_root: Path) -> None:
         self.data_root = data_root
-        self._cache: Dict[str, tuple[tuple[int, int], RunSnapshot]] = {}
+        self._cache: Dict[str, tuple[tuple[int, int, int], RunSnapshot]] = {}
         self._lock = RLock()
 
     def list_runs(self) -> List[Dict[str, Any]]:
@@ -53,12 +54,16 @@ class ResultStore:
         run_dir = self._safe_run_directory(run_id)
         manifest_path = run_dir / "manifest.json"
         papers_path = run_dir / "papers.json"
+        opportunities_path = run_dir / "opportunities.json"
         if not manifest_path.exists() or not papers_path.exists():
             raise ResultStoreError(f"Unknown or incomplete run: {run_id}")
 
         fingerprint = (
             manifest_path.stat().st_mtime_ns,
             papers_path.stat().st_mtime_ns,
+            opportunities_path.stat().st_mtime_ns
+            if opportunities_path.exists()
+            else 0,
         )
         with self._lock:
             cached = self._cache.get(run_id)
@@ -67,14 +72,31 @@ class ResultStore:
 
             manifest = self._read_json(manifest_path)
             papers = self._read_json(papers_path)
+            opportunities = (
+                self._read_json(opportunities_path)
+                if opportunities_path.exists()
+                else {"profiles": [], "directions": []}
+            )
             self._validate_manifest(manifest, manifest_path)
             self._validate_papers(papers, papers_path)
+            self._validate_opportunities(opportunities, opportunities_path)
             if manifest["run_id"] != run_id:
                 raise ResultStoreError(
                     f"Run id mismatch in {manifest_path}: {manifest['run_id']}"
                 )
             self._validate_snapshot(manifest, papers, run_dir)
-            snapshot = RunSnapshot(manifest=manifest, papers=papers)
+            if manifest.get("frontier_analysis") and not opportunities_path.exists():
+                raise ResultStoreError(
+                    f"Frontier analysis declared but file is missing: {run_dir}"
+                )
+            self._validate_frontier_coverage(
+                manifest, papers, opportunities, run_dir
+            )
+            snapshot = RunSnapshot(
+                manifest=manifest,
+                papers=papers,
+                opportunities=opportunities,
+            )
             self._cache[run_id] = (fingerprint, snapshot)
             return snapshot
 
@@ -84,6 +106,7 @@ class ResultStore:
         papers = self._filter_conference(snapshot.papers, conference)
         conferences = sorted({paper["conference"] for paper in papers})
         topics = self._topic_rows(papers)
+        opportunities = self._opportunity_view(snapshot.opportunities, papers)
         ratings = [
             float(paper["avg_rating"])
             for paper in papers
@@ -118,6 +141,13 @@ class ResultStore:
                 ),
                 "topics": [row["topic_name"] for row in topics],
                 "decisions": sorted(decisions),
+                "directions": [
+                    {
+                        "id": direction["id"],
+                        "title": direction["title"],
+                    }
+                    for direction in snapshot.opportunities.get("directions", [])
+                ],
             },
             "conference_counts": conference_counts,
             "decision_counts": [
@@ -127,6 +157,7 @@ class ResultStore:
                 )
             ],
             "topics": topics,
+            "opportunities": opportunities,
         }
 
     def query_papers(
@@ -134,6 +165,7 @@ class ResultStore:
         run_id: str,
         *,
         conference: Optional[str] = None,
+        direction: Optional[str] = None,
         topic: Optional[str] = None,
         decision: Optional[str] = None,
         query: Optional[str] = None,
@@ -144,6 +176,10 @@ class ResultStore:
         """Search, filter, sort, and paginate papers."""
         papers: Iterable[Dict[str, Any]] = self.get_snapshot(run_id).papers
         papers = self._filter_conference(papers, conference)
+        if direction:
+            papers = [
+                paper for paper in papers if paper.get("direction_id") == direction
+            ]
         if topic:
             papers = [paper for paper in papers if paper["topic_name"] == topic]
         if decision:
@@ -253,6 +289,108 @@ class ResultStore:
                 raise ResultStoreError(f"Paper source URL must use HTTPS: {path}")
 
     @staticmethod
+    def _validate_opportunities(opportunities: Any, path: Path) -> None:
+        if not isinstance(opportunities, dict):
+            raise ResultStoreError(f"Invalid opportunities payload: {path}")
+        profiles = opportunities.get("profiles", [])
+        directions = opportunities.get("directions", [])
+        if not isinstance(profiles, list) or not isinstance(directions, list):
+            raise ResultStoreError(f"Invalid opportunity collections: {path}")
+        if any(not isinstance(profile, dict) for profile in profiles):
+            raise ResultStoreError(f"Invalid opportunity profile: {path}")
+        profile_ids = {profile.get("id") for profile in profiles}
+        if None in profile_ids or len(profile_ids) != len(profiles):
+            raise ResultStoreError(f"Invalid or duplicate profile id: {path}")
+        seen_ids = set()
+        for direction in directions:
+            required = {
+                "id",
+                "title",
+                "summary",
+                "topic_ids",
+                "paper_count",
+                "barriers",
+                "scores",
+                "representative_papers",
+            }
+            if not isinstance(direction, dict) or not required.issubset(direction):
+                raise ResultStoreError(f"Invalid frontier direction: {path}")
+            if direction["id"] in seen_ids:
+                raise ResultStoreError(f"Duplicate frontier direction id: {path}")
+            seen_ids.add(direction["id"])
+            for bilingual_key in ("title", "summary"):
+                bilingual = direction[bilingual_key]
+                if (
+                    not isinstance(bilingual, dict)
+                    or not isinstance(bilingual.get("zh-CN"), str)
+                    or not isinstance(bilingual.get("en-US"), str)
+                ):
+                    raise ResultStoreError(
+                        f"Direction {bilingual_key} must be bilingual text: {path}"
+                    )
+            if profile_ids and set(direction["scores"]) != profile_ids:
+                raise ResultStoreError(f"Direction profile scores do not match: {path}")
+            for score in direction["scores"].values():
+                if (
+                    not isinstance(score, dict)
+                    or not isinstance(score.get("score"), (int, float))
+                    or not 0 <= score["score"] <= 100
+                ):
+                    raise ResultStoreError(f"Invalid direction score: {path}")
+
+    @staticmethod
+    def _validate_frontier_coverage(
+        manifest: Dict[str, Any],
+        papers: List[Dict[str, Any]],
+        opportunities: Dict[str, Any],
+        run_dir: Path,
+    ) -> None:
+        directions = opportunities.get("directions", [])
+        if not directions:
+            return
+
+        direction_by_id = {direction["id"]: direction for direction in directions}
+        declared = manifest.get("frontier_analysis", {}).get("direction_count")
+        if declared is not None and declared != len(directions):
+            raise ResultStoreError(
+                f"Frontier direction count does not match opportunities.json: {run_dir}"
+            )
+
+        actual_counts: Dict[str, int] = {}
+        actual_topics: Dict[str, set[int]] = {}
+        for paper in papers:
+            direction_id = paper.get("direction_id")
+            if direction_id not in direction_by_id:
+                raise ResultStoreError(
+                    f"Paper has an unknown frontier direction: {run_dir}"
+                )
+            actual_counts[direction_id] = actual_counts.get(direction_id, 0) + 1
+            actual_topics.setdefault(direction_id, set()).add(int(paper["topic_id"]))
+            if paper.get("direction_title") != direction_by_id[direction_id]["title"]:
+                raise ResultStoreError(
+                    f"Paper direction title does not match opportunities.json: {run_dir}"
+                )
+
+        paper_ids = {paper["id"] for paper in papers}
+        for direction in directions:
+            direction_id = direction["id"]
+            if actual_counts.get(direction_id, 0) != direction["paper_count"]:
+                raise ResultStoreError(
+                    f"Frontier paper count does not match papers.json: {run_dir}"
+                )
+            if actual_topics.get(direction_id, set()) != set(direction["topic_ids"]):
+                raise ResultStoreError(
+                    f"Frontier topic coverage does not match papers.json: {run_dir}"
+                )
+            if any(
+                paper.get("id") not in paper_ids
+                for paper in direction["representative_papers"]
+            ):
+                raise ResultStoreError(
+                    f"Unknown representative paper in opportunities.json: {run_dir}"
+                )
+
+    @staticmethod
     def _validate_snapshot(
         manifest: Dict[str, Any], papers: List[Dict[str, Any]], run_dir: Path
     ) -> None:
@@ -295,6 +433,8 @@ class ResultStore:
                     "topic_name": name,
                     "paper_count": 0,
                     "conferences": {},
+                    "direction_id": paper.get("direction_id"),
+                    "direction_title": paper.get("direction_title"),
                 },
             )
             row["paper_count"] += 1
@@ -306,3 +446,39 @@ class ResultStore:
             grouped.values(),
             key=lambda row: (-row["paper_count"], row["topic_name"].casefold()),
         )
+
+    @staticmethod
+    def _opportunity_view(
+        opportunities: Dict[str, Any], papers: Iterable[Dict[str, Any]]
+    ) -> Dict[str, Any]:
+        selected_papers = list(papers)
+        view = {
+            key: value
+            for key, value in opportunities.items()
+            if key != "directions"
+        }
+        directions = []
+        for direction in opportunities.get("directions", []):
+            direction_papers = [
+                paper
+                for paper in selected_papers
+                if paper.get("direction_id") == direction["id"]
+            ]
+            conference_counts = {
+                conference: sum(
+                    paper["conference"] == conference
+                    for paper in direction_papers
+                )
+                for conference in sorted(
+                    {paper["conference"] for paper in direction_papers}
+                )
+            }
+            directions.append(
+                {
+                    **direction,
+                    "filtered_paper_count": len(direction_papers),
+                    "filtered_conference_counts": conference_counts,
+                }
+            )
+        view["directions"] = directions
+        return view

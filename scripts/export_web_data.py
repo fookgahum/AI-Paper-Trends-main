@@ -125,7 +125,7 @@ def build_manifest(
         )
     return {
         "run_id": run_id,
-        "title": "CCF-A 2026 · 600-paper topic sample",
+        "title": "CCF-A 2026 · 600-paper frontier sample",
         "year": 2026,
         "generated_at": datetime.now(timezone.utc).isoformat(),
         "sample_seed": seed,

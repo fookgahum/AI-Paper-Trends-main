@@ -1,0 +1,296 @@
+version: 1
+
+profiles:
+  - id: individual
+    capabilities: {compute: 2, data: 2, engineering: 2, theory: 2}
+    title:
+      zh-CN: 个人/低资源
+      en-US: Individual / low-resource
+    description:
+      zh-CN: 单卡或少量 GPU，以公开数据和开源模型为主。
+      en-US: One or a few GPUs, relying mainly on public data and open models.
+  - id: standard_lab
+    capabilities: {compute: 3, data: 3, engineering: 3, theory: 3}
+    title:
+      zh-CN: 普通实验室
+      en-US: Standard lab
+    description:
+      zh-CN: 有稳定算力、团队工程能力和常规数据处理条件。
+      en-US: Stable compute, team engineering support, and routine data access.
+  - id: theory_strong
+    capabilities: {compute: 2, data: 2, engineering: 2, theory: 5}
+    title:
+      zh-CN: 理论优势
+      en-US: Theory-strong
+    description:
+      zh-CN: 算力有限，但擅长证明、优化和统计学习理论。
+      en-US: Limited compute with strong proofs, optimization, and learning theory.
+  - id: resource_lab
+    capabilities: {compute: 5, data: 4, engineering: 4, theory: 3}
+    title:
+      zh-CN: 资源型实验室
+      en-US: Resource-rich lab
+    description:
+      zh-CN: 可承担大模型训练、复杂系统或机器人实验。
+      en-US: Able to run large-model training, complex systems, or robotics experiments.
+
+directions:
+  - id: retrieval_truthfulness
+    topic_ids: [17, 19, 20]
+    title: {zh-CN: "RAG、深度检索与幻觉治理", en-US: "RAG, deep retrieval, and hallucination control"}
+    summary:
+      zh-CN: 前沿已经从“把文档检索出来”转向检索、推理、重排和可信性的一体化设计。GraphRAG 攻防、多模态检索、复杂场景评测和轻量幻觉检测都在快速形成新的问题空间。
+      en-US: The frontier is moving beyond document lookup toward integrated retrieval, reasoning, reranking, and trustworthiness. GraphRAG security, multimodal retrieval, realistic evaluation, and lightweight hallucination detection are opening concrete problem spaces.
+    why_now:
+      zh-CN: 三个会议同时出现 RAG 真实场景评测、检索推理协同、图检索攻击和幻觉检测论文，说明问题广、基线清楚、公开语料较多。
+      en-US: All three venues contain work on realistic RAG evaluation, retrieval-reasoning coordination, graph-retrieval attacks, and hallucination detection, with clear baselines and abundant public corpora.
+    entry_points:
+      zh-CN: [面向垂直领域构造高难度 RAG 评测与失败分类, 做不依赖大规模训练的检索路由或重排方法, 研究 GraphRAG 的逻辑攻击、数据污染与可验证防御]
+      en-US: ["Build a hard domain-specific RAG benchmark and failure taxonomy", "Design retrieval routing or reranking without large-scale training", "Study logical attacks/data poisoning and verifiable defenses for GraphRAG"]
+    paper_shapes:
+      zh-CN: [评测基准, 失效分析, 轻量方法, 攻防研究]
+      en-US: [Benchmark, failure analysis, lightweight method, attack/defense study]
+    best_for: {zh-CN: 低算力但能做扎实数据与评测的团队, en-US: Low-compute teams that can execute rigorous data and evaluation work}
+    avoid: {zh-CN: 只在现有 RAG 上替换一个模块、只报少量公开数据集提升，容易落入同质化。, en-US: Merely swapping one RAG module or reporting small gains on a few standard datasets is highly commoditized.}
+    barriers: {compute: 2, data: 2, engineering: 3, theory: 2}
+    representative_queries: [ViDoRe V3, Rethinking Evaluation for LLM Hallucination Detection, Logical Attacks on Graph Retrieval-Augmented Generation]
+
+  - id: agent_evaluation
+    topic_ids: [1, 12]
+    title: {zh-CN: "智能体评测、工具使用与多智能体可靠性", en-US: "Agent evaluation, tool use, and multi-agent reliability"}
+    summary:
+      zh-CN: Agent 论文的重心正在从“能完成任务”转向长上下文、多步工具调用、协议选择、风险模拟和系统可靠性。真正有价值的工作往往是发现现有 Agent 在复杂流程中的系统性失败，而不是再造一个通用框架。
+      en-US: Agent research is shifting from task completion demos toward long-context operation, multi-step tool use, protocol choice, risk simulation, and system reliability. Strong contributions expose systematic failures in complex workflows rather than adding another generic framework.
+    why_now:
+      zh-CN: 该方向样本量大且横跨 ICLR、ICML、ACL，Benchmark、Gym、Simulator 和安全协议成为高频论文形态。
+      en-US: The area is large across ICLR, ICML, and ACL, with benchmarks, gyms, simulators, and safety protocols appearing repeatedly.
+    entry_points:
+      zh-CN: [选择一个真实工作流做多轮工具调用评测, 比较多智能体协议并给出可复现实效边界, 针对提示劫持、记忆污染或权限错误构造风险模拟器]
+      en-US: ["Evaluate multi-turn tool use in one real workflow", "Compare multi-agent protocols and establish reproducible operating boundaries", "Build a risk simulator for prompt hijacking, memory poisoning, or permission failures"]
+    paper_shapes:
+      zh-CN: [Benchmark/Gym, 系统测量, 安全评测, 协议比较]
+      en-US: [Benchmark/Gym, systems measurement, safety evaluation, protocol comparison]
+    best_for: {zh-CN: 工程能力强、能搭建可复现实验环境的团队, en-US: Teams with solid engineering and reproducible environment-building skills}
+    avoid: {zh-CN: 仅把多个 Agent 串起来展示 Demo，没有新任务、失败机制或严谨对照，很难形成论文贡献。, en-US: Chaining agents into a demo without a new task, failure mechanism, or rigorous controls rarely forms a research contribution.}
+    barriers: {compute: 2, data: 3, engineering: 4, theory: 1}
+    representative_queries: [Benchmarking the Frontiers of Autonomous Agents, SciAgentGym, Safeguarding LLM Agents via an Automated Risk Simulator]
+
+  - id: time_series_foundation
+    topic_ids: [22]
+    title: {zh-CN: "时序基础模型与领域适配", en-US: "Time-series foundation models and domain adaptation"}
+    summary:
+      zh-CN: 时序研究正在吸收 LLM 的上下文学习、结构先验和生成式建模，但仍保留清晰的传统基线与公开数据集。相比通用 LLM 赛道，它更容易用中等算力做出完整、可复现的实验闭环。
+      en-US: Time-series research is adopting in-context learning, structural priors, and generative modeling while retaining clear classical baselines and public datasets. It often supports a complete, reproducible study with moderate compute.
+    why_now:
+      zh-CN: 2026 样本同时出现 LLM 时序理解、协变量上下文学习、扩散预测和结构正则化，说明方法融合仍未定型。
+      en-US: The 2026 sample includes LLM-based understanding, covariate-aware in-context learning, diffusion forecasting, and structural regularization, suggesting the design space is not settled.
+    entry_points:
+      zh-CN: [在医疗、交通、能源等单一领域做强基线下的适配研究, 研究缺失值、分布漂移和跨域泛化而非只刷平均误差, 把结构先验或因果依赖加入轻量时序模型]
+      en-US: ["Adapt strong baselines to one domain such as health, traffic, or energy", "Study missingness, shift, and cross-domain generalization rather than only average error", "Add structural priors or causal dependencies to lightweight forecasting models"]
+    paper_shapes:
+      zh-CN: [领域适配, 鲁棒性研究, 结构方法, 评测协议]
+      en-US: [Domain adaptation, robustness study, structured method, evaluation protocol]
+    best_for: {zh-CN: 希望用公开数据和中等算力完成完整实验的学生, en-US: Students seeking a complete public-data study with moderate compute}
+    avoid: {zh-CN: 简单把 LLM 接到时序输入、只在少量数据集上比较 MAE，创新性通常不足。, en-US: Simply attaching an LLM to time-series inputs and comparing MAE on a few datasets is usually insufficient.}
+    barriers: {compute: 2, data: 2, engineering: 2, theory: 3}
+    representative_queries: [LagLLM, Baguan-TS, TsLLM]
+
+  - id: llm_safety
+    topic_ids: [15]
+    title: {zh-CN: "LLM 安全、越狱检测与偏好对齐", en-US: "LLM safety, jailbreak detection, and preference alignment"}
+    summary:
+      zh-CN: 安全对齐正在从单一拒答率转向攻击生成、网络级传播、偏好优化稳定性和自适应防护。低资源团队仍能从黑盒评测、检测器和攻击分类切入，但必须避免只堆提示词。
+      en-US: Safety alignment is expanding from refusal rates to attack generation, network-level dynamics, preference-optimization stability, and adaptive safeguards. Low-resource teams can still enter through black-box evaluation, detectors, and attack taxonomies.
+    why_now:
+      zh-CN: DPO 变体、黑盒越狱、系统提示防护和图结构检测同时出现，说明训练侧与评测侧都仍有开放问题。
+      en-US: DPO variants, black-box jailbreaks, system-prompt safeguards, and graph-structured detection all appear, leaving open questions on both training and evaluation sides.
+    entry_points:
+      zh-CN: [构造跨模型、跨语言的越狱迁移评测, 做轻量黑盒检测与不确定性校准, 研究多轮或多智能体环境中的安全退化]
+      en-US: ["Build cross-model and cross-lingual jailbreak transfer evaluation", "Develop lightweight black-box detection with uncertainty calibration", "Study safety degradation in multi-turn or multi-agent settings"]
+    paper_shapes:
+      zh-CN: [红队评测, 检测方法, 对齐稳定性分析, 防御基准]
+      en-US: [Red-team evaluation, detector, alignment stability analysis, defense benchmark]
+    best_for: {zh-CN: 能做严谨对抗评测、但不具备大模型预训练资源的团队, en-US: Teams capable of rigorous adversarial evaluation without pretraining-scale resources}
+    avoid: {zh-CN: 只收集一批攻击提示并报告成功率，缺少威胁模型、迁移性和防御分析时价值有限。, en-US: A prompt collection with attack success rates but no threat model, transfer analysis, or defense evaluation has limited value.}
+    barriers: {compute: 2, data: 2, engineering: 3, theory: 2}
+    representative_queries: [Alignment-Weighted DPO, SHARP, GraphShield]
+
+  - id: efficient_llm
+    topic_ids: [0, 5, 16]
+    title: {zh-CN: "高效推理、Token 压缩与模型操控", en-US: "Efficient inference, token compression, and model steering"}
+    summary:
+      zh-CN: 高效大模型研究正在同时推进视觉 Token 剪枝、扩散语言模型解码、参数高效适配和激活操控。评价标准清楚，但方向拥挤，必须在速度、显存和质量之间给出可信的端到端收益。
+      en-US: Efficient-model research spans visual-token pruning, diffusion-language-model decoding, parameter-efficient adaptation, and activation steering. Evaluation is clear, but the area is crowded and requires credible end-to-end speed, memory, and quality gains.
+    why_now:
+      zh-CN: 三个会议都在研究推理成本，且从架构内剪枝扩展到测试时搜索、并行解码和参数子空间方法。
+      en-US: All three venues address inference cost, expanding from architecture-aware pruning to test-time search, parallel decoding, and parameter-subspace methods.
+    entry_points:
+      zh-CN: [在小型开源模型上研究可解释的 Token/层选择, 建立真实硬件上的延迟—质量评测而非只报 FLOPs, 针对特定任务做低秩适配或激活操控的稳定性研究]
+      en-US: ["Study interpretable token/layer selection on smaller open models", "Measure latency-quality tradeoffs on real hardware rather than FLOPs alone", "Analyze stability of low-rank adaptation or activation steering for a specific task"]
+    paper_shapes:
+      zh-CN: [高效方法, 系统评测, 稳定性分析, 压缩基准]
+      en-US: [Efficiency method, systems evaluation, stability analysis, compression benchmark]
+    best_for: {zh-CN: 有模型工程经验、能做严格速度与质量测量的团队, en-US: Teams with model engineering and rigorous speed/quality measurement skills}
+    avoid: {zh-CN: 只在理想 FLOPs 上宣称加速，或只在一个模型/任务上报告微小提升，可信度不足。, en-US: Claiming speedups from idealized FLOPs or tiny gains on one model/task is not convincing.}
+    barriers: {compute: 3, data: 2, engineering: 3, theory: 3}
+    representative_queries: [Query-Guided Visual Token Pruning, FineSteer, Accelerating Diffusion Large Language Models]
+
+  - id: multimodal_reasoning
+    topic_ids: [2, 3]
+    title: {zh-CN: "多模态推理、知识融合与细粒度评测", en-US: "Multimodal reasoning, knowledge fusion, and fine-grained evaluation"}
+    summary:
+      zh-CN: 多模态研究正从图文问答扩展到科学欺诈、空间程序、语音文本混合和跨模态知识蒸馏。机会主要来自高难任务定义与可诊断评测，而不是简单增加模态编码器。
+      en-US: Multimodal work is moving beyond image-text QA toward scientific forensics, spatial programs, speech-text mixtures, and cross-modal knowledge distillation. The clearest openings are hard task definitions and diagnostic evaluation.
+    why_now:
+      zh-CN: 样本覆盖视觉数学、科学文档、空间推理、情感与知识图谱，任务边界快速扩张但评价协议尚不统一。
+      en-US: The sample spans visual math, scientific documents, spatial reasoning, emotion, and knowledge graphs, while evaluation protocols remain unsettled.
+    entry_points:
+      zh-CN: [选一个高价值垂直任务建立细粒度错误分类, 研究模态缺失、错配和噪声下的鲁棒性, 用小模型做跨模态蒸馏或数据质量研究]
+      en-US: ["Build fine-grained error taxonomies for one high-value task", "Study robustness to missing, mismatched, or noisy modalities", "Explore cross-modal distillation or data quality with smaller models"]
+    paper_shapes:
+      zh-CN: [任务/基准, 鲁棒性分析, 蒸馏方法, 数据质量]
+      en-US: [Task/benchmark, robustness analysis, distillation method, data quality]
+    best_for: {zh-CN: 有垂直数据或评测设计能力的团队, en-US: Teams with vertical-domain data or strong evaluation design}
+    avoid: {zh-CN: 仅在通用图文数据上换融合模块，往往需要大量算力且差异不明显。, en-US: Swapping a fusion module on generic image-text data often costs substantial compute with weak differentiation.}
+    barriers: {compute: 4, data: 4, engineering: 3, theory: 2}
+    representative_queries: [RewardMap, MathFlow, Cross-Modal Knowledge Distillation]
+
+  - id: causal_foundation
+    topic_ids: [8]
+    title: {zh-CN: "因果发现与基础模型结合", en-US: "Causal discovery meets foundation models"}
+    summary:
+      zh-CN: 因果学习正在与 Transformer、先验数据拟合网络和结构约束预测结合。方向论文量不算最大，但要求对可识别性、潜变量和统计假设有真正贡献，适合理论与实验兼顾的团队。
+      en-US: Causal learning is merging with transformers, prior-data fitted networks, and structurally constrained prediction. The field is not the largest, but credible work must engage with identifiability, latent variables, and statistical assumptions.
+    why_now:
+      zh-CN: 基础模型开始承担因果结构学习与推断任务，同时传统可识别性问题仍未被模型规模消解。
+      en-US: Foundation models are beginning to perform causal structure learning and inference, while classical identifiability problems remain unresolved by scale.
+    entry_points:
+      zh-CN: [在明确假设下研究 Transformer 的因果结构学习机制, 做潜混杂或分布变化下的可识别性与鲁棒性, 构造能揭示伪因果捷径的诊断基准]
+      en-US: ["Study transformer causal-structure mechanisms under explicit assumptions", "Analyze identifiability and robustness under latent confounding or shift", "Build diagnostics that expose spurious causal shortcuts"]
+    paper_shapes:
+      zh-CN: [理论+实验, 可识别性, 机制分析, 诊断基准]
+      en-US: [Theory plus experiments, identifiability, mechanism analysis, diagnostic benchmark]
+    best_for: {zh-CN: 有统计学习、因果推断或理论基础的团队, en-US: Teams grounded in statistical learning, causal inference, or theory}
+    avoid: {zh-CN: 仅把 Transformer 用作黑盒预测器而不讨论因果假设，容易被认为只是相关性建模。, en-US: Using a transformer as a black-box predictor without causal assumptions is likely to be treated as correlation modeling.}
+    barriers: {compute: 3, data: 3, engineering: 2, theory: 5}
+    representative_queries: [Foundation Models for Causal Inference, How Transformers Learn Causal Structures, Recursive Decomposition Framework]
+
+  - id: reasoning_rl
+    topic_ids: [9, 18]
+    title: {zh-CN: "推理强化学习与可验证奖励", en-US: "Reasoning reinforcement learning and verifiable rewards"}
+    summary:
+      zh-CN: RLVR 正在围绕奖励稀疏、离策略数据利用、搜索与自我校验快速演化。它是明显前沿，但已经高度拥挤，可靠训练和大规模消融通常需要较强算力。
+      en-US: RLVR is rapidly evolving around sparse rewards, off-policy data use, search, and self-verification. It is clearly frontier work, but highly competitive and usually requires substantial compute for stable training and ablations.
+    why_now:
+      zh-CN: 两个大主题合计覆盖大量论文，研究从数学推理扩展到代码、芯片、扩散模型与通用搜索。
+      en-US: Two large clusters cover work extending from mathematical reasoning into code, chip design, diffusion models, and general search.
+    entry_points:
+      zh-CN: [低资源条件下做训练动态、失败模式和数据效率分析, 在可自动验证的小领域设计高质量奖励, 研究搜索预算、提示和不确定性对推理的影响]
+      en-US: ["Analyze training dynamics, failure modes, and data efficiency at smaller scale", "Design strong verifiable rewards in a narrowly checkable domain", "Study how search budgets, hints, and uncertainty affect reasoning"]
+    paper_shapes:
+      zh-CN: [训练机制分析, 数据效率, 奖励设计, 搜索策略]
+      en-US: [Training-mechanism analysis, data efficiency, reward design, search strategy]
+    best_for: {zh-CN: 有稳定多卡算力和强化学习经验的团队, en-US: Teams with stable multi-GPU compute and reinforcement-learning expertise}
+    avoid: {zh-CN: 直接与大实验室比模型最终分数并不现实；低资源更应研究机制、数据和评测。, en-US: Competing directly with large labs on final model scores is unrealistic; low-resource work should focus on mechanisms, data, and evaluation.}
+    barriers: {compute: 5, data: 3, engineering: 4, theory: 3}
+    representative_queries: [Reward and Guidance through Rubrics, Data Efficient RLVR, Knowing What You Don’t Know Matters]
+
+  - id: embodied_memory
+    topic_ids: [11, 23]
+    title: {zh-CN: "长程智能体记忆、VLA 与具身任务", en-US: "Long-horizon agent memory, VLA, and embodied tasks"}
+    summary:
+      zh-CN: 长程任务把记忆更新、世界模型、子目标发现和视觉语言动作模型连接起来。方向价值高，但真实机器人、仿真环境和长序列训练让复现实验门槛明显高于纯文本 Agent。
+      en-US: Long-horizon tasks connect memory updating, world models, subgoal discovery, and vision-language-action models. The opportunity is significant, but robotics, simulation, and long-sequence training make replication much harder than text-only agents.
+    why_now:
+      zh-CN: 论文同时探索外部记忆、离视野操作、潜动作监督和目标条件强化学习，说明“长期可靠执行”仍是 Agent 的核心瓶颈。
+      en-US: Work on external memory, out-of-view manipulation, latent-action supervision, and goal-conditioned RL shows that reliable long-horizon execution remains a core agent bottleneck.
+    entry_points:
+      zh-CN: [优先在可复现仿真中研究记忆失效与恢复, 做长任务评测和子目标分解而非训练超大模型, 利用离线轨迹研究数据效率与错误累积]
+      en-US: ["Study memory failures and recovery in reproducible simulation", "Build long-task evaluation and subgoal decomposition rather than huge models", "Use offline trajectories to study data efficiency and error accumulation"]
+    paper_shapes:
+      zh-CN: [仿真评测, 记忆机制, 子目标方法, 离线分析]
+      en-US: [Simulation evaluation, memory mechanism, subgoal method, offline analysis]
+    best_for: {zh-CN: 有机器人/仿真平台和系统训练经验的团队, en-US: Teams with robotics or simulation platforms and systems-training experience}
+    avoid: {zh-CN: 没有稳定环境与复现预算时，容易把大量时间耗在系统搭建而不是研究问题上。, en-US: Without a stable environment and replication budget, most effort may go into infrastructure rather than research.}
+    barriers: {compute: 5, data: 4, engineering: 5, theory: 3}
+    representative_queries: ["Spatial Memory for Out-of-Vision Manipulation", "Practical World Model-based Reinforcement Learning", "Memory, Benchmark & Robots"]
+
+  - id: generative_vision_3d
+    topic_ids: [6, 14]
+    title: {zh-CN: "生成视觉、视频与 3D 世界建模", en-US: "Generative vision, video, and 3D world modeling"}
+    summary:
+      zh-CN: 图像生成正在走向多主体、可编辑和自生成监督，3D 则追求单图场景生成与秒级重建。结果直观、影响力高，但训练数据、GPU 和评测成本都很重。
+      en-US: Image generation is moving toward multi-subject control, editability, and self-generated supervision, while 3D work targets single-image worlds and rapid reconstruction. Results are compelling, but data, GPU, and evaluation costs are high.
+    why_now:
+      zh-CN: 自回归图像、扩散视频、多主体生成和快速 3D 场景在同一年度集中出现，模型形态仍在竞争。
+      en-US: Autoregressive images, diffusion video, multi-subject generation, and fast 3D scenes all appear in the same year, with model paradigms still competing.
+    entry_points:
+      zh-CN: [做真实服务场景的生成质量或编辑评测, 研究数据来源、版权与可追溯性, 在冻结模型上做轻量控制、压缩或失败分析]
+      en-US: ["Evaluate generation/editing in real service scenarios", "Study data provenance, copyright, and traceability", "Build lightweight control, compression, or failure analysis on frozen models"]
+    paper_shapes:
+      zh-CN: [评测基准, 数据治理, 轻量控制, 失败分析]
+      en-US: [Evaluation benchmark, data governance, lightweight control, failure analysis]
+    best_for: {zh-CN: 有视觉算力、数据和生成模型工程经验的团队, en-US: Teams with vision compute, data, and generative-model engineering}
+    avoid: {zh-CN: 低资源团队直接训练新生成模型风险很高，应优先做评测、数据或冻结模型方法。, en-US: Training a new generator is high-risk for low-resource teams; evaluation, data, or frozen-model methods are safer.}
+    barriers: {compute: 5, data: 5, engineering: 4, theory: 2}
+    representative_queries: [Data Provenance for Image Auto-Regressive Generation, ServImage, FlashWorld]
+
+  - id: theory_optimization
+    topic_ids: [7, 13, 21]
+    title: {zh-CN: "学习理论、优化与在线决策", en-US: "Learning theory, optimization, and online decision-making"}
+    summary:
+      zh-CN: 该方向覆盖 Bandit/MDP 遗憾界、梯度动力学、泛化条件和鲁棒优化。算力要求低，但证明门槛最高；对理论基础强的人，它反而是最“资源友好”的赛道。
+      en-US: This area covers regret bounds for bandits/MDPs, gradient dynamics, generalization conditions, and robust optimization. Compute needs are low, but proof requirements are highest; for strong theorists it can be the most resource-efficient path.
+    why_now:
+      zh-CN: 2026 论文持续把经典理论问题连接到现代嵌入、神经网络和学习增强算法，理论空间并未被大模型取代。
+      en-US: The 2026 papers connect classical theory to modern embeddings, neural networks, and learning-augmented algorithms; foundation models have not displaced this agenda.
+    entry_points:
+      zh-CN: [从一个清晰反例或现有界的缺口出发, 把现代模型现象抽象为可证明的简化问题, 用小规模实验验证理论预测而非追求大模型分数]
+      en-US: ["Start from a clear counterexample or gap in an existing bound", "Abstract a modern-model phenomenon into a provable simplified problem", "Use small experiments to validate theoretical predictions rather than chase large-model scores"]
+    paper_shapes:
+      zh-CN: [理论定理, 反例, 收敛分析, 理论+小实验]
+      en-US: [Theorem, counterexample, convergence analysis, theory plus small experiments]
+    best_for: {zh-CN: 数学基础强、算力有限的研究者, en-US: Mathematically strong researchers with limited compute}
+    avoid: {zh-CN: 如果没有可证明的新结论，只做复杂符号包装通常不能替代实质理论贡献。, en-US: Complex notation cannot substitute for a genuinely new provable result.}
+    barriers: {compute: 1, data: 1, engineering: 1, theory: 5}
+    representative_queries: [Cost of Information, Necessary Conditions for Compositional Generalization, Gradient Descent as a Perceptron Algorithm]
+
+  - id: pretraining_interpretability
+    topic_ids: [4]
+    title: {zh-CN: "预训练表征演化与机制解释", en-US: "Pretraining representation evolution and mechanistic interpretation"}
+    summary:
+      zh-CN: 机制研究开始追踪概念在预训练过程中的出现、巩固和叠加，并用激活解释器连接模型内部表征与行为。方向论文量较小，但问题清晰，适合复用公开检查点做深分析。
+      en-US: Mechanistic work is tracking how concepts emerge, consolidate, and superpose during pretraining, while activation explainers connect internal representations to behavior. The area is smaller but supports deep analysis using public checkpoints.
+    why_now:
+      zh-CN: 研究从静态探针转向训练时间轴、特征几何和可干预机制，为不重新预训练模型的研究留下空间。
+      en-US: Work is moving from static probes to training trajectories, feature geometry, and intervention, leaving room for studies that do not pretrain models from scratch.
+    entry_points:
+      zh-CN: [利用公开中间检查点追踪一个能力或偏差的形成, 比较探针、稀疏特征与干预结论的一致性, 把机制指标与下游失效或安全现象连接]
+      en-US: ["Trace the formation of one capability or bias through public checkpoints", "Compare probes, sparse features, and intervention conclusions", "Connect mechanism metrics to downstream failures or safety behavior"]
+    paper_shapes:
+      zh-CN: [机制分析, 检查点研究, 干预实验, 可解释工具]
+      en-US: [Mechanism analysis, checkpoint study, intervention experiment, interpretability tool]
+    best_for: {zh-CN: 擅长分析、能访问公开检查点但算力中等的团队, en-US: Analysis-oriented teams with public checkpoints and moderate compute}
+    avoid: {zh-CN: 仅展示相关性热图、不做干预或行为验证，难以支持机制结论。, en-US: Correlation heatmaps without intervention or behavioral validation do not establish mechanisms.}
+    barriers: {compute: 3, data: 2, engineering: 3, theory: 4}
+    representative_queries: [Evolution of Concepts in Language Model Pre-Training, Crosscoding Through Time, Activation Oracles]
+
+  - id: human_ai_creation
+    topic_ids: [10]
+    title: {zh-CN: "人机共创、叙事与可视化智能体", en-US: "Human-AI creation, narrative, and visualization agents"}
+    summary:
+      zh-CN: 该方向关注复杂叙事、交互生成和可视化编码 Agent，论文数量较少但任务新、用户价值明确。切入点通常不是更大的模型，而是任务设计、人类评价和可控交互。
+      en-US: This smaller direction covers complex narratives, interactive generation, and visualization-coding agents. The opportunity is less about larger models and more about task design, human evaluation, and controllable interaction.
+    why_now:
+      zh-CN: 从故事一致性到交互动作和可视化编程，生成系统开始接受更接近真实创作流程的评价。
+      en-US: From story coherence to interaction and visualization programming, generative systems are being evaluated against more realistic creative workflows.
+    entry_points:
+      zh-CN: [为一个创作流程定义可重复的人机评价协议, 研究多轮修订、可控性和一致性而非单次生成, 建立小而高质量的专家标注数据]
+      en-US: ["Define a repeatable human-AI evaluation protocol for one creative workflow", "Study iterative revision, control, and coherence rather than one-shot generation", "Build a small high-quality expert-annotated dataset"]
+    paper_shapes:
+      zh-CN: [人类评价, 交互系统, 新任务/数据集, 生成质量分析]
+      en-US: [Human evaluation, interactive system, new task/dataset, generation-quality analysis]
+    best_for: {zh-CN: 有 HCI、可视化或特定创作领域资源的团队, en-US: Teams with HCI, visualization, or creative-domain expertise}
+    avoid: {zh-CN: 仅做主观案例展示、没有用户研究或可复现评价，会削弱论文说服力。, en-US: Subjective demos without user studies or reproducible evaluation are weak evidence.}
+    barriers: {compute: 2, data: 3, engineering: 3, theory: 1}
+    representative_queries: [PlotCraft, VisCoder2, Evaluating Visual Narrative Coherence]

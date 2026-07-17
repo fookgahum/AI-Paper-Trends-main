@@ -56,6 +56,7 @@ def create_app(data_root: Optional[Path] = None) -> FastAPI:
     async def papers(
         run_id: str,
         conference: Optional[str] = None,
+        direction: Optional[str] = None,
         topic: Optional[str] = None,
         decision: Optional[str] = None,
         q: Optional[str] = None,
@@ -67,6 +68,7 @@ def create_app(data_root: Optional[Path] = None) -> FastAPI:
             return store.query_papers(
                 run_id,
                 conference=conference,
+                direction=direction,
                 topic=topic,
                 decision=decision,
                 query=q,
