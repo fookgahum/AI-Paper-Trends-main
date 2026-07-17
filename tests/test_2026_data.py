@@ -42,7 +42,7 @@ class SampleImportTests(unittest.TestCase):
 
 
 class WebExportTests(unittest.TestCase):
-    def test_build_papers_maps_topics_and_nullable_metrics(self) -> None:
+    def test_build_papers_maps_topics_and_list_fields(self) -> None:
         dataframe = pd.DataFrame(
             [
                 {
@@ -54,10 +54,7 @@ class WebExportTests(unittest.TestCase):
                     "authors": "['Alice']",
                     "keywords": "['topic']",
                     "decision": "Poster",
-                    "avg_rating": None,
-                    "source_topic": "AI",
                     "source_url": "https://example.test/paper",
-                    "source_name": "Official",
                     "Topic": 3,
                 }
             ]
@@ -65,7 +62,7 @@ class WebExportTests(unittest.TestCase):
         papers = build_papers(dataframe, {3: "Topic label"})
         self.assertEqual(papers[0]["topic_name"], "Topic label")
         self.assertEqual(papers[0]["authors"], ["Alice"])
-        self.assertIsNone(papers[0]["avg_rating"])
+        self.assertNotIn("avg_rating", papers[0])
 
     def test_manifest_counts_sources(self) -> None:
         papers = [
@@ -114,6 +111,31 @@ class WebExportTests(unittest.TestCase):
         self.assertEqual(
             {paper["direction_id"] for paper in papers},
             {item["id"] for item in directions},
+        )
+        expected_paper_fields = {
+            "id",
+            "conference",
+            "year",
+            "title",
+            "abstract",
+            "authors",
+            "keywords",
+            "decision",
+            "topic_id",
+            "topic_name",
+            "source_url",
+            "direction_id",
+            "direction_title",
+        }
+        self.assertTrue(
+            all(set(paper) == expected_paper_fields for paper in papers)
+        )
+        self.assertTrue(
+            all(
+                "sample_share" not in item
+                and "heavy_compute_signal_rate" not in item
+                for item in directions
+            )
         )
         self.assertTrue(
             all(

@@ -54,7 +54,6 @@ def _write_snapshot(root: Path) -> None:
             "authors": ["Ada"],
             "keywords": ["graph"],
             "decision": "Poster",
-            "avg_rating": None,
             "topic_id": 0,
             "topic_name": "Graph learning",
             "direction_id": "graph_systems",
@@ -73,7 +72,6 @@ def _write_snapshot(root: Path) -> None:
             "authors": ["Bo"],
             "keywords": ["evaluation"],
             "decision": "Published (Long Paper)",
-            "avg_rating": None,
             "topic_id": 1,
             "topic_name": "Language evaluation",
             "direction_id": "language_evaluation",
@@ -137,9 +135,7 @@ class ResultStoreTests(unittest.TestCase):
             dashboard = ResultStore(root).dashboard("demo")
 
         self.assertEqual(dashboard["overview"]["paper_count"], 2)
-        self.assertEqual(dashboard["overview"]["conference_count"], 2)
-        self.assertEqual(dashboard["overview"]["topic_count"], 2)
-        self.assertEqual(dashboard["overview"]["rated_paper_count"], 0)
+        self.assertEqual(set(dashboard["overview"]), {"paper_count"})
         self.assertEqual(
             dashboard["filters"]["conferences"], ["ACL", "ICLR"]
         )

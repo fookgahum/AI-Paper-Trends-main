@@ -5,7 +5,6 @@ from __future__ import annotations
 import json
 from dataclasses import dataclass
 from pathlib import Path
-from statistics import fmean
 from threading import RLock
 from typing import Any, Dict, Iterable, List, Optional
 
@@ -104,43 +103,22 @@ class ResultStore:
         """Build reconciled overview, filter, and topic data for a run."""
         snapshot = self.get_snapshot(run_id)
         papers = self._filter_conference(snapshot.papers, conference)
-        conferences = sorted({paper["conference"] for paper in papers})
         topics = self._topic_rows(papers)
         opportunities = self._opportunity_view(snapshot.opportunities, papers)
-        ratings = [
-            float(paper["avg_rating"])
-            for paper in papers
-            if paper.get("avg_rating") is not None
-        ]
-        decisions: Dict[str, int] = {}
-        for paper in papers:
-            decision = str(paper.get("decision") or "N/A")
-            decisions[decision] = decisions.get(decision, 0) + 1
-
-        conference_counts = [
-            {
-                "conference": name,
-                "paper_count": sum(
-                    paper["conference"] == name for paper in papers
-                ),
-            }
-            for name in conferences
-        ]
+        decisions = sorted(
+            {str(paper.get("decision") or "N/A") for paper in papers}
+        )
         return {
             "manifest": snapshot.manifest,
             "overview": {
                 "paper_count": len(papers),
-                "conference_count": len(conferences),
-                "topic_count": len(topics),
-                "rated_paper_count": len(ratings),
-                "avg_rating": round(fmean(ratings), 2) if ratings else None,
             },
             "filters": {
                 "conferences": sorted(
                     {paper["conference"] for paper in snapshot.papers}
                 ),
                 "topics": [row["topic_name"] for row in topics],
-                "decisions": sorted(decisions),
+                "decisions": decisions,
                 "directions": [
                     {
                         "id": direction["id"],
@@ -149,13 +127,6 @@ class ResultStore:
                     for direction in snapshot.opportunities.get("directions", [])
                 ],
             },
-            "conference_counts": conference_counts,
-            "decision_counts": [
-                {"decision": name, "paper_count": count}
-                for name, count in sorted(
-                    decisions.items(), key=lambda item: item[1], reverse=True
-                )
-            ],
             "topics": topics,
             "opportunities": opportunities,
         }
@@ -208,11 +179,6 @@ class ResultStore:
             ),
             "topic": lambda paper: (
                 paper["topic_name"].casefold(),
-                paper["title"].casefold(),
-            ),
-            "rating": lambda paper: (
-                paper.get("avg_rating") is None,
-                -(paper.get("avg_rating") or 0),
                 paper["title"].casefold(),
             ),
         }

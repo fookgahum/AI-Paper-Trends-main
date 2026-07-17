@@ -51,12 +51,6 @@ def _parse_list(value: Any) -> List[str]:
     return []
 
 
-def _nullable_float(value: Any) -> float | None:
-    if value is None or pd.isna(value):
-        return None
-    return float(value)
-
-
 def load_topic_labels(path: Path) -> Dict[int, str]:
     with path.open("r", encoding="utf-8") as file:
         raw = yaml.safe_load(file) or {}
@@ -93,12 +87,9 @@ def build_papers(dataframe: pd.DataFrame, labels: Dict[int, str]) -> List[Dict[s
                 "authors": _parse_list(row["authors"]),
                 "keywords": _parse_list(row.get("keywords")),
                 "decision": str(row.get("decision") or "Published"),
-                "avg_rating": _nullable_float(row.get("avg_rating")),
                 "topic_id": topic_id,
                 "topic_name": topic_name,
-                "source_topic": str(row.get("source_topic") or ""),
                 "source_url": str(row["source_url"]),
-                "source_name": str(row.get("source_name") or "Official source"),
             }
         )
     return sorted(papers, key=lambda paper: (paper["conference"], paper["title"]))

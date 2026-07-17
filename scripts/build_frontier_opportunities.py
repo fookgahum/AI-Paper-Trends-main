@@ -23,13 +23,6 @@ EVALUATION_PATTERN = re.compile(
     r"diagnostic|analysis|taxonomy|empirical study|systematic study)\b",
     re.IGNORECASE,
 )
-HEAVY_COMPUTE_PATTERN = re.compile(
-    r"\b(pre-?train|training from scratch|large-scale|billion|video generation|"
-    r"3d generation|world model|robotic|reinforcement learning|diffusion model)\b",
-    re.IGNORECASE,
-)
-
-
 def _load_json(path: Path) -> Any:
     with path.open("r", encoding="utf-8") as file:
         return json.load(file)
@@ -237,7 +230,6 @@ def build_opportunity_payload(
         )
         breadth = _breadth_score(conference_counts)
         evaluation_rate = _signal_rate(direction_papers, EVALUATION_PATTERN)
-        heavy_compute_rate = _signal_rate(direction_papers, HEAVY_COMPUTE_PATTERN)
         barriers = {
             name: int(value) for name, value in direction["barriers"].items()
         }
@@ -253,14 +245,12 @@ def build_opportunity_payload(
         }
         direction["topic_ids"] = sorted(topic_ids)
         direction["paper_count"] = len(direction_papers)
-        direction["sample_share"] = round(len(direction_papers) / len(papers) * 100, 1)
         direction["conference_counts"] = {
             conference: conference_counts.get(conference, 0)
             for conference in CONFERENCES
         }
         direction["breadth_score"] = breadth
         direction["evaluation_signal_rate"] = evaluation_rate
-        direction["heavy_compute_signal_rate"] = heavy_compute_rate
         direction["competition_pressure"] = _competition_pressure(
             len(direction_papers)
         )

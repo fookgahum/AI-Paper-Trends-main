@@ -20,13 +20,11 @@ PROGRAM_SOURCES = {
         "program": "https://iclr.cc/static/virtual/data/iclr-2026-orals-posters.json",
         "abstracts": "https://iclr.cc/static/virtual/data/iclr-2026-abstracts.json",
         "base_url": "https://iclr.cc",
-        "source_name": "ICLR 2026 official virtual program",
     },
     "ICML": {
         "program": "https://icml.cc/static/virtual/data/icml-2026-orals-posters.json",
         "abstracts": "https://icml.cc/static/virtual/data/icml-2026-abstracts.json",
         "base_url": "https://icml.cc",
-        "source_name": "ICML 2026 official virtual program",
     },
 }
 ACL_URL = "https://aclanthology.org/events/acl-2026/"
@@ -104,11 +102,7 @@ def fetch_virtual_program(
                 "authors": authors,
                 "keywords": _normalise_keywords(record.get("keywords")),
                 "decision": str(record.get("decision") or "Accepted").strip(),
-                "avg_rating": None,
-                "review_ratings": [],
-                "source_topic": str(record.get("topic") or "").strip(),
                 "source_url": urljoin(source["base_url"], str(paper_url)),
-                "source_name": source["source_name"],
             }
         )
     log(f"{conference}: {len(papers)} valid public program papers found")
@@ -159,11 +153,7 @@ def parse_acl_long_papers(html: str) -> List[Dict[str, Any]]:
                 "authors": authors,
                 "keywords": [],
                 "decision": "Published (Long Paper)",
-                "avg_rating": None,
-                "review_ratings": [],
-                "source_topic": "Natural Language Processing",
                 "source_url": f"https://aclanthology.org/{anthology_id}/",
-                "source_name": "ACL 2026 official ACL Anthology proceedings",
             }
         )
     return papers

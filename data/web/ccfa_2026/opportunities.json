@@ -170,7 +170,6 @@
         20
       ],
       "paper_count": 67,
-      "sample_share": 11.2,
       "conference_counts": {
         "ICLR": 12,
         "ICML": 15,
@@ -178,7 +177,6 @@
       },
       "breadth_score": 87,
       "evaluation_signal_rate": 69,
-      "heavy_compute_signal_rate": 16,
       "competition_pressure": "high",
       "evidence_confidence": "high",
       "scores": {
@@ -297,7 +295,6 @@
         12
       ],
       "paper_count": 67,
-      "sample_share": 11.2,
       "conference_counts": {
         "ICLR": 18,
         "ICML": 15,
@@ -305,7 +302,6 @@
       },
       "breadth_score": 94,
       "evaluation_signal_rate": 79,
-      "heavy_compute_signal_rate": 24,
       "competition_pressure": "high",
       "evidence_confidence": "high",
       "scores": {
@@ -421,7 +417,6 @@
         22
       ],
       "paper_count": 32,
-      "sample_share": 5.3,
       "conference_counts": {
         "ICLR": 10,
         "ICML": 17,
@@ -429,7 +424,6 @@
       },
       "breadth_score": 90,
       "evaluation_signal_rate": 53,
-      "heavy_compute_signal_rate": 12,
       "competition_pressure": "medium",
       "evidence_confidence": "medium",
       "scores": {
@@ -547,7 +541,6 @@
         15
       ],
       "paper_count": 38,
-      "sample_share": 6.3,
       "conference_counts": {
         "ICLR": 15,
         "ICML": 11,
@@ -555,7 +548,6 @@
       },
       "breadth_score": 99,
       "evaluation_signal_rate": 58,
-      "heavy_compute_signal_rate": 21,
       "competition_pressure": "medium",
       "evidence_confidence": "high",
       "scores": {
@@ -673,7 +665,6 @@
         16
       ],
       "paper_count": 77,
-      "sample_share": 12.8,
       "conference_counts": {
         "ICLR": 24,
         "ICML": 24,
@@ -681,7 +672,6 @@
       },
       "breadth_score": 100,
       "evaluation_signal_rate": 44,
-      "heavy_compute_signal_rate": 23,
       "competition_pressure": "high",
       "evidence_confidence": "high",
       "scores": {
@@ -798,7 +788,6 @@
         3
       ],
       "paper_count": 43,
-      "sample_share": 7.2,
       "conference_counts": {
         "ICLR": 19,
         "ICML": 12,
@@ -806,7 +795,6 @@
       },
       "breadth_score": 98,
       "evaluation_signal_rate": 56,
-      "heavy_compute_signal_rate": 35,
       "competition_pressure": "medium",
       "evidence_confidence": "high",
       "scores": {
@@ -924,7 +912,6 @@
         8
       ],
       "paper_count": 31,
-      "sample_share": 5.2,
       "conference_counts": {
         "ICLR": 14,
         "ICML": 15,
@@ -932,7 +919,6 @@
       },
       "breadth_score": 81,
       "evaluation_signal_rate": 52,
-      "heavy_compute_signal_rate": 19,
       "competition_pressure": "medium",
       "evidence_confidence": "medium",
       "scores": {
@@ -1051,7 +1037,6 @@
         18
       ],
       "paper_count": 76,
-      "sample_share": 12.7,
       "conference_counts": {
         "ICLR": 23,
         "ICML": 24,
@@ -1059,7 +1044,6 @@
       },
       "breadth_score": 100,
       "evaluation_signal_rate": 37,
-      "heavy_compute_signal_rate": 59,
       "competition_pressure": "high",
       "evidence_confidence": "high",
       "scores": {
@@ -1177,7 +1161,6 @@
         23
       ],
       "paper_count": 39,
-      "sample_share": 6.5,
       "conference_counts": {
         "ICLR": 12,
         "ICML": 19,
@@ -1185,7 +1168,6 @@
       },
       "breadth_score": 94,
       "evaluation_signal_rate": 49,
-      "heavy_compute_signal_rate": 46,
       "competition_pressure": "medium",
       "evidence_confidence": "high",
       "scores": {
@@ -1306,7 +1288,6 @@
         14
       ],
       "paper_count": 42,
-      "sample_share": 7.0,
       "conference_counts": {
         "ICLR": 20,
         "ICML": 13,
@@ -1314,7 +1295,6 @@
       },
       "breadth_score": 95,
       "evaluation_signal_rate": 40,
-      "heavy_compute_signal_rate": 19,
       "competition_pressure": "medium",
       "evidence_confidence": "high",
       "scores": {
@@ -1432,7 +1412,6 @@
         21
       ],
       "paper_count": 56,
-      "sample_share": 9.3,
       "conference_counts": {
         "ICLR": 22,
         "ICML": 28,
@@ -1440,7 +1419,6 @@
       },
       "breadth_score": 87,
       "evaluation_signal_rate": 29,
-      "heavy_compute_signal_rate": 12,
       "competition_pressure": "medium_high",
       "evidence_confidence": "high",
       "scores": {
@@ -1556,7 +1534,6 @@
         4
       ],
       "paper_count": 16,
-      "sample_share": 2.7,
       "conference_counts": {
         "ICLR": 6,
         "ICML": 5,
@@ -1564,7 +1541,6 @@
       },
       "breadth_score": 100,
       "evaluation_signal_rate": 62,
-      "heavy_compute_signal_rate": 25,
       "competition_pressure": "lower",
       "evidence_confidence": "medium",
       "scores": {
@@ -1682,7 +1658,6 @@
         10
       ],
       "paper_count": 16,
-      "sample_share": 2.7,
       "conference_counts": {
         "ICLR": 5,
         "ICML": 2,
@@ -1690,7 +1665,6 @@
       },
       "breadth_score": 86,
       "evaluation_signal_rate": 88,
-      "heavy_compute_signal_rate": 19,
       "competition_pressure": "lower",
       "evidence_confidence": "medium",
       "scores": {
