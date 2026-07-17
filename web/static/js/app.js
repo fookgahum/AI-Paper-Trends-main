@@ -3,9 +3,16 @@
 const translations = {
   "zh-CN": {
     brandSubtitle: "前沿选题雷达", navOpportunities: "研究机会", navTopics: "聚类证据",
-    navPapers: "论文浏览", navData: "方法与数据", navAbout: "关于", localReadOnly: "本地只读分析",
+    navPapers: "论文浏览", navUpdates: "论文增量", navLearning: "学习与复现", navData: "方法与数据", navAbout: "关于", localReadOnly: "本地研究工作台",
     dashboardEyebrow: "FRONTIER OPPORTUNITY RADAR", opportunitiesTitle: "哪些方向更适合写论文？",
-    topicsTitle: "聚类证据", papersTitle: "论文证据", dataTitle: "方法与数据", aboutPageTitle: "关于平台",
+    topicsTitle: "聚类证据", papersTitle: "论文证据", updatesTitle: "论文增量", learningTitle: "学习与复现", dataTitle: "方法与数据", aboutPageTitle: "关于平台",
+    updatesEyebrow: "PAPER INGESTION", updatesHeading: "从公开网址拉取论文增量", updatesIntro: "输入论文集页面或 JSON 地址；系统解析、标准化并去重。拉取不会自动调用付费 AI。",
+    newPaperSource: "新增论文来源", sourceUrl: "公开网址", sourceConference: "会议", sourceYear: "年份", sourceParser: "页面类型", parserAuto: "自动识别",
+    downloadPdfs: "同时下载公开 PDF（较慢）", startPull: "开始拉取", pullSafety: "仅允许公网 HTTP/HTTPS 地址；本地和内网地址会被拒绝。", jobProgress: "任务进度", pullResult: "本次拉取结果", noPullYet: "尚未开始拉取。", savedSources: "已保存来源", localPapers: "本地论文", pullAgain: "再次拉取", noSavedSources: "还没有保存的来源。",
+    directionUpdateHeading: "分析未归类论文与新方向候选", directionUpdateIntro: "这是独立的 AI 任务；只有点击后才运行。结果保存为草稿，不会自动修改正式 13 个方向。", analysisLimit: "本次最多分析", analyseNewPapers: "用 AI 分析新论文", noDirectionUpdate: "尚未运行方向更新。", mappedExisting: "映射到现有方向", candidatePapers: "候选论文", noPendingPapers: "没有等待分析的新论文", draftCandidate: "候选方向草稿",
+    learningEyebrow: "LEARN → REPRODUCE → RESEARCH", learningHeading: "把前沿方向变成可执行的学习与复现路径", learningIntro: "基于当前方向和锚点论文，生成知识树、7/30/90 天计划、复现阶梯与最小研究假设。",
+    planSettings: "学习计划设置", chooseDirection: "前沿方向", duration: "周期", weeklyHours: "每周小时", experience: "当前基础", beginner: "入门", intermediate: "中等", advanced: "进阶", computeProfile: "算力条件", cpuOnly: "纯 CPU", singleGpu: "单卡或 CPU", multiGpu: "多卡", cloudFlexible: "弹性云资源", generatePlan: "生成学习计划", mockHint: "默认 mock 模式不产生费用；切换配置后由统一云端接口生成。", noPlanYet: "选择一个方向后生成计划。",
+    knowledgeTree: "知识树", planStages: "阶段计划", anchorPapers: "锚点论文", reproductionLadder: "复现阶梯", researchHypotheses: "最小研究假设", deliverable: "交付物", acceptance: "验收标准", markDone: "标记完成", completed: "已完成", cloudReady: "云端已配置", mockMode: "Mock 免费测试", cloudMissing: "云端缺少 API Key", jobFailed: "任务失败", jobRunning: "任务执行中", parsedPapers: "解析", newPapers: "新增", duplicatePapers: "重复", rejectedPapers: "拒绝",
     dataset: "数据集", conference: "会议", allConferences: "全部会议", loading: "正在生成方向建议…",
     decisionCaveatTitle: "先说明“容易写”的含义", decisionCaveat: "切入友好度衡量资源匹配、可做题型和证据广度，不是录用率，也不保证论文发表。",
     heuristicBadge: "决策辅助 · 非录用预测", heroEyebrow: "ANSWER FIRST", heroTitle: "不要再看关键词串，直接看哪里值得切入",
@@ -47,9 +54,16 @@ const translations = {
   },
   "en-US": {
     brandSubtitle: "Frontier opportunity radar", navOpportunities: "Research opportunities", navTopics: "Cluster evidence",
-    navPapers: "Papers", navData: "Method & data", navAbout: "About", localReadOnly: "Local read-only analysis",
+    navPapers: "Papers", navUpdates: "Paper updates", navLearning: "Learn & reproduce", navData: "Method & data", navAbout: "About", localReadOnly: "Local research workbench",
     dashboardEyebrow: "FRONTIER OPPORTUNITY RADAR", opportunitiesTitle: "Which directions are more practical to publish in?",
-    topicsTitle: "Cluster evidence", papersTitle: "Paper evidence", dataTitle: "Method & data", aboutPageTitle: "About",
+    topicsTitle: "Cluster evidence", papersTitle: "Paper evidence", updatesTitle: "Paper updates", learningTitle: "Learn & reproduce", dataTitle: "Method & data", aboutPageTitle: "About",
+    updatesEyebrow: "PAPER INGESTION", updatesHeading: "Pull paper updates from a public URL", updatesIntro: "Enter a proceedings page or JSON feed. The system parses, normalizes, and deduplicates without invoking paid AI.",
+    newPaperSource: "Add paper source", sourceUrl: "Public URL", sourceConference: "Conference", sourceYear: "Year", sourceParser: "Page type", parserAuto: "Auto-detect",
+    downloadPdfs: "Also download public PDFs (slower)", startPull: "Start pull", pullSafety: "Only public HTTP/HTTPS URLs are accepted; local and private-network targets are rejected.", jobProgress: "Job progress", pullResult: "Pull result", noPullYet: "No pull has started.", savedSources: "Saved sources", localPapers: "local papers", pullAgain: "Pull again", noSavedSources: "No saved sources yet.",
+    directionUpdateHeading: "Analyse unclassified papers and new direction candidates", directionUpdateIntro: "This is a separate AI task and runs only when clicked. Results stay as drafts and never alter the 13 published directions automatically.", analysisLimit: "Maximum papers", analyseNewPapers: "Analyse new papers with AI", noDirectionUpdate: "No direction update has run.", mappedExisting: "Mapped to existing directions", candidatePapers: "Candidate papers", noPendingPapers: "No new papers are waiting for analysis", draftCandidate: "Direction candidate draft",
+    learningEyebrow: "LEARN → REPRODUCE → RESEARCH", learningHeading: "Turn a frontier direction into a learning and reproduction path", learningIntro: "Generate a knowledge tree, 7/30/90-day plan, reproduction ladder, and minimum research hypothesis from anchor papers.",
+    planSettings: "Learning-plan settings", chooseDirection: "Frontier direction", duration: "Duration", weeklyHours: "Hours per week", experience: "Experience", beginner: "Beginner", intermediate: "Intermediate", advanced: "Advanced", computeProfile: "Compute profile", cpuOnly: "CPU only", singleGpu: "Single GPU or CPU", multiGpu: "Multiple GPUs", cloudFlexible: "Flexible cloud", generatePlan: "Generate learning plan", mockHint: "Mock mode is free by default; switch the config to use the unified cloud interface.", noPlanYet: "Choose a direction and generate a plan.",
+    knowledgeTree: "Knowledge tree", planStages: "Plan stages", anchorPapers: "Anchor papers", reproductionLadder: "Reproduction ladder", researchHypotheses: "Minimum research hypotheses", deliverable: "Deliverable", acceptance: "Acceptance", markDone: "Mark done", completed: "Completed", cloudReady: "Cloud configured", mockMode: "Free mock test", cloudMissing: "Cloud API key missing", jobFailed: "Job failed", jobRunning: "Job running", parsedPapers: "Parsed", newPapers: "New", duplicatePapers: "Duplicates", rejectedPapers: "Rejected",
     dataset: "Dataset", conference: "Conference", allConferences: "All conferences", loading: "Building direction recommendations…",
     decisionCaveatTitle: "What “easier to enter” means", decisionCaveat: "Entry friendliness measures resource fit, viable paper shapes, and evidence breadth. It is not an acceptance rate or publication guarantee.",
     heuristicBadge: "Decision aid · not acceptance prediction", heroEyebrow: "ANSWER FIRST", heroTitle: "Move beyond keyword strings and see where to enter",
@@ -100,6 +114,7 @@ const state = {
   page: 1,
   pageSize: 20,
   charts: {},
+  activeLearningPlan: null,
 };
 
 const $ = (selector) => document.querySelector(selector);
@@ -132,8 +147,11 @@ const safeUrl = (value) => {
   }
 };
 
-async function fetchJson(url) {
-  const response = await fetch(url, { headers: { Accept: "application/json" } });
+async function fetchJson(url, options = {}) {
+  const response = await fetch(url, {
+    ...options,
+    headers: { Accept: "application/json", ...(options.body ? { "Content-Type": "application/json" } : {}), ...(options.headers || {}) },
+  });
   if (!response.ok) {
     const payload = await response.json().catch(() => ({}));
     throw new Error(payload.detail || `${response.status} ${response.statusText}`);
@@ -159,7 +177,7 @@ function applyTranslations() {
 function updatePageTitle(section) {
   const key = {
     opportunities: "opportunitiesTitle", topics: "topicsTitle", papers: "papersTitle",
-    data: "dataTitle", about: "aboutPageTitle",
+    updates: "updatesTitle", learning: "learningTitle", data: "dataTitle", about: "aboutPageTitle",
   }[section];
   $("#page-title").textContent = t(key);
 }
@@ -264,6 +282,7 @@ function renderAll() {
   populatePaperFilters();
   renderMethodology();
   renderProvenance(state.dashboard.manifest);
+  populateLearningDirections();
 }
 
 function renderOpportunities() {
@@ -541,6 +560,227 @@ function renderProvenance(manifest) {
   $("#sources-table-body").innerHTML = manifest.sources.map((source) => `<tr><td><strong>${escapeHtml(source.conference)}</strong></td><td><a href="${escapeHtml(safeUrl(source.url))}" target="_blank" rel="noopener noreferrer">${escapeHtml(source.label)}</a></td><td>${Number(source.paper_count).toLocaleString()}</td><td>${escapeHtml(source.scope || "")}</td></tr>`).join("");
 }
 
+function populateLearningDirections() {
+  const select = $("#learning-direction");
+  if (!select || !state.dashboard) return;
+  const current = select.value;
+  const directions = state.dashboard.opportunities?.directions || [];
+  select.innerHTML = directions.map((direction) =>
+    `<option value="${escapeHtml(direction.id)}">${escapeHtml(localize(direction.title))}</option>`
+  ).join("");
+  if ([...select.options].some((option) => option.value === current)) select.value = current;
+}
+
+async function pollJob(jobId, onUpdate) {
+  for (let attempt = 0; attempt < 180; attempt += 1) {
+    const job = await fetchJson(`/api/jobs/${encodeURIComponent(jobId)}`);
+    onUpdate(job);
+    if (["completed", "failed", "cancelled"].includes(job.status)) return job;
+    await new Promise((resolve) => setTimeout(resolve, 800));
+  }
+  throw new Error("Job did not finish within the browser polling window.");
+}
+
+function renderPullJob(job) {
+  const target = $("#paper-pull-status");
+  if (job.status === "failed") {
+    target.innerHTML = `<div class="job-error"><strong>${escapeHtml(t("jobFailed"))}</strong><p>${escapeHtml(job.error?.message || "Unknown error")}</p></div>`;
+    return;
+  }
+  if (job.status !== "completed") {
+    const percent = job.progress_total ? Math.round(job.progress_current / job.progress_total * 100) : 0;
+    target.innerHTML = `<div class="job-status"><strong>${escapeHtml(t("jobRunning"))}: ${escapeHtml(job.stage)}</strong><div class="progress-track"><span style="width:${percent}%"></span></div><small>${job.progress_current}/${job.progress_total}</small></div>`;
+    return;
+  }
+  const result = job.result;
+  target.innerHTML = `<div class="result-metrics">
+    <div><strong>${result.parsed}</strong><span>${escapeHtml(t("parsedPapers"))}</span></div>
+    <div><strong>${result.new}</strong><span>${escapeHtml(t("newPapers"))}</span></div>
+    <div><strong>${result.duplicate}</strong><span>${escapeHtml(t("duplicatePapers"))}</span></div>
+    <div><strong>${result.rejected}</strong><span>${escapeHtml(t("rejectedPapers"))}</span></div>
+  </div>`;
+}
+
+async function submitPaperPull(event) {
+  event.preventDefault();
+  const button = event.currentTarget.querySelector('button[type="submit"]');
+  button.disabled = true;
+  try {
+    const created = await fetchJson("/api/paper-pulls", {
+      method: "POST",
+      body: JSON.stringify({
+        url: $("#source-url").value.trim(),
+        conference: $("#source-conference").value.trim(),
+        year: Number($("#source-year").value),
+        parser: $("#source-parser").value,
+        download_pdf: $("#source-download-pdf").checked,
+        remember_source: true,
+      }),
+    });
+    await pollJob(created.job_id, renderPullJob);
+    await loadWorkbenchStatus();
+  } catch (error) {
+    renderPullJob({ status: "failed", error: { message: error.message } });
+  } finally {
+    button.disabled = false;
+  }
+}
+
+async function pullSavedSource(sourceId, button) {
+  button.disabled = true;
+  try {
+    const created = await fetchJson(`/api/paper-sources/${encodeURIComponent(sourceId)}/pull`, { method: "POST" });
+    showSection("updates");
+    await pollJob(created.job_id, renderPullJob);
+    await loadWorkbenchStatus();
+  } catch (error) {
+    renderPullJob({ status: "failed", error: { message: error.message } });
+  } finally {
+    button.disabled = false;
+  }
+}
+
+async function loadWorkbenchStatus() {
+  const [sourcePayload, paperPayload, cloud, updates] = await Promise.all([
+    fetchJson("/api/paper-sources"), fetchJson("/api/local/papers?limit=1"), fetchJson("/api/cloud/status"), fetchJson("/api/direction-updates?limit=1"),
+  ]);
+  $("#local-paper-count").textContent = `${paperPayload.count.toLocaleString()} ${t("localPapers")}`;
+  $("#cloud-status").textContent = cloud.provider === "mock" ? t("mockMode") : (cloud.configured ? t("cloudReady") : t("cloudMissing"));
+  $("#cloud-status").classList.toggle("warning-badge", !cloud.configured);
+  const target = $("#saved-sources");
+  target.innerHTML = sourcePayload.items.length ? sourcePayload.items.map((source) => `
+    <div class="saved-source-row">
+      <div><strong>${escapeHtml(source.conference)} ${source.year}</strong><a href="${escapeHtml(safeUrl(source.url))}" target="_blank" rel="noopener noreferrer">${escapeHtml(source.url)}</a><small>${escapeHtml(source.parser_type)} · ${escapeHtml(source.last_pulled_at || "—")}</small></div>
+      <button class="secondary-button saved-source-pull" data-source-id="${escapeHtml(source.id)}">${escapeHtml(t("pullAgain"))}</button>
+    </div>`).join("") : `<div class="empty-state">${escapeHtml(t("noSavedSources"))}</div>`;
+  $$('.saved-source-pull').forEach((button) => button.addEventListener("click", () => pullSavedSource(button.dataset.sourceId, button)));
+  if (updates.items.length) renderDirectionArtifact(updates.items[0].artifact);
+}
+
+function renderDirectionArtifact(artifact) {
+  const mapped = artifact.assignments.filter((item) => item.direction_id).length;
+  const candidates = artifact.candidates || [];
+  $("#direction-update-status").innerHTML = `<p class="direction-synthesis">${escapeHtml(artifact.synthesis)}</p>
+    <div class="result-metrics direction-result-metrics"><div><strong>${mapped}</strong><span>${escapeHtml(t("mappedExisting"))}</span></div><div><strong>${artifact.assignments.length - mapped}</strong><span>${escapeHtml(t("candidatePapers"))}</span></div></div>
+    <div class="candidate-list">${candidates.map((candidate) => `<article><span class="panel-kicker">${escapeHtml(t("draftCandidate"))}</span><h4>${escapeHtml(candidate.title)}</h4><p>${escapeHtml(candidate.summary)}</p><strong>${escapeHtml(candidate.difference_from_existing)}</strong><small>${escapeHtml(candidate.recommended_action)}</small><div class="conference-chips">${candidate.evidence_paper_ids.map((id) => `<span class="chip">${escapeHtml(id)}</span>`).join("")}</div></article>`).join("")}</div>`;
+}
+
+function renderDirectionJob(job) {
+  const target = $("#direction-update-status");
+  if (job.status === "failed") {
+    target.innerHTML = `<div class="job-error"><strong>${escapeHtml(t("jobFailed"))}</strong><p>${escapeHtml(job.error?.message || "Unknown error")}</p></div>`;
+    return;
+  }
+  if (job.status !== "completed") {
+    const percent = job.progress_total ? Math.round(job.progress_current / job.progress_total * 100) : 0;
+    target.innerHTML = `<div class="job-status"><strong>${escapeHtml(t("jobRunning"))}: ${escapeHtml(job.stage)}</strong><div class="progress-track"><span style="width:${percent}%"></span></div><small>${job.progress_current}/${job.progress_total}</small></div>`;
+    return;
+  }
+  if (!job.result.update_id) {
+    target.innerHTML = `<div class="empty-state">${escapeHtml(t("noPendingPapers"))}</div>`;
+    return;
+  }
+  renderDirectionArtifact({
+    run_id: state.runId,
+    assignments: job.result.assignments,
+    candidates: job.result.candidates,
+    synthesis: job.result.synthesis,
+  });
+}
+
+async function submitDirectionUpdate(event) {
+  event.preventDefault();
+  const button = event.currentTarget.querySelector('button[type="submit"]');
+  button.disabled = true;
+  try {
+    const created = await fetchJson("/api/direction-updates", {
+      method: "POST",
+      body: JSON.stringify({
+        run_id: state.runId,
+        paper_limit: Number($("#direction-paper-limit").value),
+        language: state.language,
+      }),
+    });
+    await pollJob(created.job_id, renderDirectionJob);
+  } catch (error) {
+    renderDirectionJob({ status: "failed", error: { message: error.message } });
+  } finally {
+    button.disabled = false;
+  }
+}
+
+function renderLearningJob(job) {
+  const target = $("#learning-plan-output");
+  if (job.status === "failed") {
+    target.innerHTML = `<div class="job-error"><strong>${escapeHtml(t("jobFailed"))}</strong><p>${escapeHtml(job.error?.message || "Unknown error")}</p></div>`;
+    return;
+  }
+  if (job.status !== "completed") {
+    const percent = job.progress_total ? Math.round(job.progress_current / job.progress_total * 100) : 0;
+    target.innerHTML = `<div class="job-status"><strong>${escapeHtml(t("jobRunning"))}: ${escapeHtml(job.stage)}</strong><div class="progress-track"><span style="width:${percent}%"></span></div><small>${job.progress_current}/${job.progress_total}</small></div>`;
+  }
+}
+
+async function submitLearningPlan(event) {
+  event.preventDefault();
+  const button = event.currentTarget.querySelector('button[type="submit"]');
+  button.disabled = true;
+  try {
+    const created = await fetchJson("/api/learning/plans", {
+      method: "POST",
+      body: JSON.stringify({
+        run_id: state.runId,
+        direction_id: $("#learning-direction").value,
+        duration_days: Number($("#learning-duration").value),
+        language: state.language,
+        experience_level: $("#learning-experience").value,
+        weekly_hours: Number($("#learning-hours").value),
+        compute_profile: $("#learning-compute").value,
+      }),
+    });
+    const job = await pollJob(created.job_id, renderLearningJob);
+    if (job.status === "completed") {
+      state.activeLearningPlan = await fetchJson(`/api/learning/plans/${encodeURIComponent(job.result.plan_id)}`);
+      renderLearningPlan(state.activeLearningPlan);
+    }
+  } catch (error) {
+    renderLearningJob({ status: "failed", error: { message: error.message } });
+  } finally {
+    button.disabled = false;
+  }
+}
+
+function renderLearningPlan(plan) {
+  const artifact = plan.artifact;
+  const progress = Object.fromEntries((plan.progress || []).map((item) => [item.task_id, item]));
+  const nodes = artifact.knowledge_tree.map((node) => `<li><strong>${escapeHtml(node.title)}</strong><p>${escapeHtml(node.reason)}</p><small>${escapeHtml(t("deliverable"))}: ${escapeHtml(node.deliverable)} · ${node.estimated_hours}h</small></li>`).join("");
+  const stages = artifact.stages.map((stage) => `<article class="plan-stage"><header><span>DAY ${stage.day_start}—${stage.day_end}</span><h4>${escapeHtml(stage.title)}</h4></header>${stage.tasks.map((task) => {
+    const done = progress[task.id]?.status === "done";
+    return `<div class="plan-task ${done ? "task-done" : ""}"><h5>${escapeHtml(task.title)}</h5>${listMarkup(task.actions)}<p><strong>${escapeHtml(t("deliverable"))}:</strong> ${escapeHtml(task.deliverable)}</p><p><strong>${escapeHtml(t("acceptance"))}:</strong> ${escapeHtml(task.acceptance)}</p><button class="secondary-button plan-task-toggle" data-task-id="${escapeHtml(task.id)}" data-done="${done}">${escapeHtml(done ? t("completed") : t("markDone"))}</button></div>`;
+  }).join("")}</article>`).join("");
+  const anchors = artifact.anchor_papers.map((paper) => `<li><span class="chip">${escapeHtml(paper.reproduction_level)}</span><a href="${escapeHtml(safeUrl(paper.source_url))}" target="_blank" rel="noopener noreferrer">${escapeHtml(paper.title)}</a><p>${escapeHtml(paper.reason)}</p></li>`).join("");
+  const ladder = artifact.reproduction_ladder.map((level) => `<div><strong>${escapeHtml(level.level)} · ${escapeHtml(level.title)}</strong><p>${escapeHtml(level.goal)}</p><small>${escapeHtml(level.acceptance)}</small></div>`).join("");
+  const hypotheses = artifact.research_hypotheses.map((item) => `<article><h4>${escapeHtml(item.question)}</h4><p>${escapeHtml(item.novelty)}</p><strong>${escapeHtml(item.minimum_experiment)}</strong>${listMarkup(item.risks)}</article>`).join("");
+  $("#learning-plan-output").innerHTML = `<div class="learning-plan-header"><span class="panel-kicker">${artifact.duration_days} DAYS</span><h2>${escapeHtml(artifact.direction_title)}</h2><p>${escapeHtml(artifact.executive_summary)}</p></div>
+    <section class="learning-block"><h3>${escapeHtml(t("knowledgeTree"))}</h3><ol class="knowledge-tree">${nodes}</ol></section>
+    <section class="learning-block"><h3>${escapeHtml(t("planStages"))}</h3><div class="plan-stages">${stages}</div></section>
+    <section class="learning-block"><h3>${escapeHtml(t("anchorPapers"))}</h3><ol class="anchor-list">${anchors}</ol></section>
+    <section class="learning-block"><h3>${escapeHtml(t("reproductionLadder"))}</h3><div class="reproduction-ladder">${ladder}</div></section>
+    <section class="learning-block"><h3>${escapeHtml(t("researchHypotheses"))}</h3><div class="hypothesis-list">${hypotheses}</div></section>`;
+  $$('.plan-task-toggle').forEach((button) => button.addEventListener("click", () => toggleLearningTask(plan.id, button.dataset.taskId, button.dataset.done === "true")));
+}
+
+async function toggleLearningTask(planId, taskId, isDone) {
+  try {
+    state.activeLearningPlan = await fetchJson(`/api/learning/plans/${encodeURIComponent(planId)}/tasks/${encodeURIComponent(taskId)}`, {
+      method: "PATCH", body: JSON.stringify({ status: isDone ? "todo" : "done", notes: "", actual_hours: null }),
+    });
+    renderLearningPlan(state.activeLearningPlan);
+  } catch (error) {
+    showError(error);
+  }
+}
+
 function rerenderLanguageDependentContent() {
   applyTranslations();
   if (state.dashboard) {
@@ -575,6 +815,9 @@ function bindEvents() {
   });
   $("#recommendation-filter").addEventListener("change", () => renderOpportunityCards(sortedDirections()));
   $("#methodology-link").addEventListener("click", () => showSection("data"));
+  $("#paper-pull-form").addEventListener("submit", submitPaperPull);
+  $("#direction-update-form").addEventListener("submit", submitDirectionUpdate);
+  $("#learning-plan-form").addEventListener("submit", submitLearningPlan);
   $("#paper-filters").addEventListener("submit", (event) => { event.preventDefault(); state.page = 1; loadPapers(); });
   $("#direction-filter").addEventListener("change", () => { if ($("#direction-filter").value) $("#topic-filter").value = ""; });
   $("#topic-filter").addEventListener("change", () => { if ($("#topic-filter").value) $("#direction-filter").value = ""; });
@@ -590,7 +833,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   bindEvents();
   applyTranslations();
   try {
-    await loadRuns();
+    await Promise.all([loadRuns(), loadWorkbenchStatus()]);
   } catch (error) {
     showError(error);
   }

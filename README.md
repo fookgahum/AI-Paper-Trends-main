@@ -2,7 +2,7 @@
 
 # AI Paper Trends
 
-AI Paper Trends is a local research dashboard and reproducible analysis pipeline for public computer-science conference papers. It can fetch public OpenReview submissions, import selected official 2026 proceedings, build topic models, generate reports, and serve the exported results through a bilingual read-only website.
+AI Paper Trends is a local research dashboard and reproducible analysis pipeline for public computer-science conference papers. It can fetch public papers, build topic models, summarize frontier opportunities, and turn a selected direction into an executable learning and reproduction plan.
 
 ## Current capabilities
 
@@ -14,6 +14,10 @@ AI Paper Trends is a local research dashboard and reproducible analysis pipeline
 - Rank entry friendliness for individual, standard-lab, theory-strong, and resource-rich profiles while exposing compute, data, engineering, and theory barriers.
 - Drill from each recommendation into representative and supporting papers, filter by venue/direction/base topic/type, and verify against official source links.
 - Rebuild the included 2026 dataset from official ICLR, ICML, and ACL sources.
+- Pull incremental papers from a public JSON/HTML/ACL Anthology URL, normalize fields, deduplicate in SQLite, save source snapshots, and optionally download public PDFs without invoking AI.
+- Manually run an AI direction-update job after pulling: map new papers to an existing direction or save an evidence-grounded new-direction candidate as a draft, without changing the 13 published directions.
+- Generate a validated knowledge tree, 7/30/90-day plan, grounded anchor papers, an L0-L4 reproduction ladder, and minimum research hypotheses.
+- Run the complete learning workflow for free with the deterministic mock client, or switch one configuration file to an OpenAI-compatible cloud API.
 
 ## Included 2026 web dataset
 
@@ -38,7 +42,33 @@ Start the local server:
 python -m uvicorn web.app:app --host 127.0.0.1 --port 8000
 ```
 
-Open `http://127.0.0.1:8000`. Docker is not required. Opening the website never starts model training; it only reads the committed files in `data/web/`.
+Open `http://127.0.0.1:8000`. Docker is not required. Opening the website never starts model training. Published analysis snapshots stay in `data/web/`; local paper sources, jobs, learning progress, and generated plans stay in the Git-ignored `data/local/app.db`.
+
+## Paper updates
+
+Use the **Paper updates** page to enter a public proceedings or JSON URL. Pulling, parsing, deduplication, and optional PDF download are independent of AI. The same workflow is available from PowerShell:
+
+```powershell
+python -m scripts.pull_papers "https://example.org/papers.json" --conference DEMO --year 2026 --parser json
+```
+
+The first implementation supports common JSON feeds (including OpenReview-style `notes` payloads), ACL Anthology event pages, and proceedings-style HTML whose paper cards contain abstracts. Unsupported page layouts fail visibly and retain a job error instead of silently importing incomplete records.
+
+New papers remain `unanalysed` until you explicitly click **Analyse new papers with AI**. The resulting mappings and new-direction candidates are durable drafts in SQLite. This makes the “new 2026 direction” path updateable while keeping the published snapshot stable and reviewable.
+
+## AI learning plans and the cloud API boundary
+
+The default [`settings/cloud_ai.yaml`](settings/cloud_ai.yaml) uses `provider: mock`, so the website and tests make no paid request. The only real cloud request implementation is [`src/cloud_ai/client.py`](src/cloud_ai/client.py). To use an OpenAI-compatible Chat Completions service:
+
+1. Change `provider` to `openai_compatible`, set the service `base_url`, and set the actual `model` in `settings/cloud_ai.yaml`.
+2. Set the API key only in the process environment:
+
+```powershell
+$env:CLOUD_AI_API_KEY = "your-key"
+python -m uvicorn web.app:app --host 127.0.0.1 --port 8000
+```
+
+The returned JSON must pass the local Pydantic contract: valid dependency DAG, contiguous plan stages, grounded anchor-paper IDs, measurable deliverables, and an ordered L0-L4 reproduction ladder. A malformed cloud response is recorded as a failed job and is not published as a plan.
 
 ## Rebuild the 2026 dataset
 
@@ -55,7 +85,7 @@ python -u -m scripts.build_2026_dashboard --skip-fetch
 python -u -m scripts.build_2026_dashboard --skip-fetch --skip-model
 ```
 
-Raw data, processed CSV files, and model artifacts remain Git-ignored. Only the compact read-only web export is committed.
+Raw data, local SQLite state, processed CSV files, and model artifacts remain Git-ignored. Only the compact published web export is committed.
 
 ## Run an OpenReview analysis
 
@@ -84,8 +114,12 @@ topic_modeling:
 ```text
 configs/                  Analysis and web-dataset configurations
 data/web/                 Committed read-only dashboard snapshots
-docs/images/              Example analysis output
-scripts/                  Official 2026 import/build/export commands
+docs/                     Architecture and product design notes
+scripts/                  Official builds and the URL paper-pull CLI
+settings/cloud_ai.yaml     Cloud provider/model settings without secrets
+src/cloud_ai/              Validated mock/real AI boundary and learning service
+src/paper_sources/         URL parsing, normalization, deduplication, and PDF pull
+src/storage/               Local SQLite schema and application queries
 src/get_papers.py         OpenReview ingestion
 src/run_topic_modeling.py BERTopic and lightweight CPU topic backends
 src/analyze.py            Statistical reports and static charts

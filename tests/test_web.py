@@ -169,7 +169,9 @@ class WebApiTests(unittest.IsolatedAsyncioTestCase):
         with tempfile.TemporaryDirectory() as directory:
             root = Path(directory)
             _write_snapshot(root)
-            transport = httpx.ASGITransport(app=create_app(root))
+            transport = httpx.ASGITransport(
+                app=create_app(root, local_root=root / "local")
+            )
             async with httpx.AsyncClient(
                 transport=transport, base_url="http://testserver"
             ) as client:
@@ -183,7 +185,9 @@ class WebApiTests(unittest.IsolatedAsyncioTestCase):
 
         self.assertEqual(home.status_code, 200)
         self.assertIn("AI Paper Trends", home.text)
-        self.assertEqual(health.json(), {"status": "ok", "run_count": 1})
+        self.assertEqual(health.json()["status"], "ok")
+        self.assertEqual(health.json()["run_count"], 1)
+        self.assertEqual(health.json()["cloud_provider"], "mock")
         self.assertEqual(runs.json()["items"][0]["run_id"], "demo")
         self.assertEqual(dashboard.json()["overview"]["paper_count"], 2)
         self.assertEqual(
@@ -193,7 +197,10 @@ class WebApiTests(unittest.IsolatedAsyncioTestCase):
 
     async def test_missing_run_returns_404(self) -> None:
         with tempfile.TemporaryDirectory() as directory:
-            transport = httpx.ASGITransport(app=create_app(Path(directory)))
+            root = Path(directory)
+            transport = httpx.ASGITransport(
+                app=create_app(root, local_root=root / "local")
+            )
             async with httpx.AsyncClient(
                 transport=transport, base_url="http://testserver"
             ) as client:

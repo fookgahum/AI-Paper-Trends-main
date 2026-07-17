@@ -21,22 +21,28 @@
           <button class="nav-item active" data-section="opportunities">
             <span class="nav-symbol" aria-hidden="true">01</span><span data-i18n="navOpportunities">研究机会</span>
           </button>
+          <button class="nav-item" data-section="updates">
+            <span class="nav-symbol" aria-hidden="true">02</span><span data-i18n="navUpdates">论文增量</span>
+          </button>
+          <button class="nav-item" data-section="learning">
+            <span class="nav-symbol" aria-hidden="true">03</span><span data-i18n="navLearning">学习与复现</span>
+          </button>
           <button class="nav-item" data-section="topics">
-            <span class="nav-symbol" aria-hidden="true">02</span><span data-i18n="navTopics">聚类证据</span>
+            <span class="nav-symbol" aria-hidden="true">04</span><span data-i18n="navTopics">聚类证据</span>
           </button>
           <button class="nav-item" data-section="papers">
-            <span class="nav-symbol" aria-hidden="true">03</span><span data-i18n="navPapers">论文浏览</span>
+            <span class="nav-symbol" aria-hidden="true">05</span><span data-i18n="navPapers">论文浏览</span>
           </button>
           <button class="nav-item" data-section="data">
-            <span class="nav-symbol" aria-hidden="true">04</span><span data-i18n="navData">方法与数据</span>
+            <span class="nav-symbol" aria-hidden="true">06</span><span data-i18n="navData">方法与数据</span>
           </button>
           <button class="nav-item" data-section="about">
-            <span class="nav-symbol" aria-hidden="true">05</span><span data-i18n="navAbout">关于</span>
+            <span class="nav-symbol" aria-hidden="true">07</span><span data-i18n="navAbout">关于</span>
           </button>
         </nav>
         <div class="sidebar-note">
           <span class="status-dot"></span>
-          <span data-i18n="localReadOnly">本地只读分析</span>
+          <span data-i18n="localReadOnly">本地研究工作台</span>
         </div>
       </aside>
 
@@ -164,6 +170,82 @@
             </label>
           </div>
           <div id="opportunity-grid" class="opportunity-grid"></div>
+        </section>
+
+        <section id="updates" class="page-section">
+          <div class="section-intro">
+            <div>
+              <span class="eyebrow" data-i18n="updatesEyebrow">PAPER INGESTION</span>
+              <h2 data-i18n="updatesHeading">从公开网址拉取论文增量</h2>
+              <p data-i18n="updatesIntro">输入论文集页面或 JSON 地址；系统解析、标准化并去重。拉取不会自动调用付费 AI。</p>
+            </div>
+          </div>
+          <div class="workbench-grid">
+            <form id="paper-pull-form" class="panel workbench-form">
+              <h3 data-i18n="newPaperSource">新增论文来源</h3>
+              <label><span data-i18n="sourceUrl">公开网址</span><input id="source-url" type="url" required placeholder="https://..."></label>
+              <div class="form-row">
+                <label><span data-i18n="sourceConference">会议</span><input id="source-conference" required placeholder="ICLR"></label>
+                <label><span data-i18n="sourceYear">年份</span><input id="source-year" type="number" min="1950" max="2100" required value="2026"></label>
+              </div>
+              <label><span data-i18n="sourceParser">页面类型</span>
+                <select id="source-parser">
+                  <option value="auto" data-i18n="parserAuto">自动识别</option>
+                  <option value="json">JSON</option><option value="html">HTML</option><option value="acl">ACL Anthology</option>
+                </select>
+              </label>
+              <label class="check-label"><input id="source-download-pdf" type="checkbox"><span data-i18n="downloadPdfs">同时下载公开 PDF（较慢）</span></label>
+              <button class="primary-button" type="submit" data-i18n="startPull">开始拉取</button>
+              <p class="form-help" data-i18n="pullSafety">仅允许公网 HTTP/HTTPS 地址；本地和内网地址会被拒绝。</p>
+            </form>
+            <article class="panel workbench-result">
+              <span class="panel-kicker" data-i18n="jobProgress">JOB PROGRESS</span>
+              <h3 data-i18n="pullResult">本次拉取结果</h3>
+              <div id="paper-pull-status" class="empty-state" data-i18n="noPullYet">尚未开始拉取。</div>
+            </article>
+          </div>
+          <article class="panel saved-sources-panel">
+            <div class="panel-heading"><div><span class="panel-kicker">SAVED SOURCES</span><h2 data-i18n="savedSources">已保存来源</h2></div><span id="local-paper-count" class="result-count">—</span></div>
+            <div id="saved-sources" class="saved-source-list"></div>
+          </article>
+          <article class="panel direction-update-panel">
+            <div class="panel-heading">
+              <div><span class="panel-kicker">AI DIRECTION UPDATE</span><h2 data-i18n="directionUpdateHeading">分析未归类论文与新方向候选</h2><p data-i18n="directionUpdateIntro">这是独立的 AI 任务；只有点击后才运行。结果保存为草稿，不会自动修改正式 13 个方向。</p></div>
+            </div>
+            <form id="direction-update-form" class="inline-action-form">
+              <label><span data-i18n="analysisLimit">本次最多分析</span><input id="direction-paper-limit" type="number" min="1" max="200" value="50"></label>
+              <button class="primary-button" type="submit" data-i18n="analyseNewPapers">用 AI 分析新论文</button>
+            </form>
+            <div id="direction-update-status" class="empty-state" data-i18n="noDirectionUpdate">尚未运行方向更新。</div>
+          </article>
+        </section>
+
+        <section id="learning" class="page-section">
+          <div class="section-intro">
+            <div>
+              <span class="eyebrow" data-i18n="learningEyebrow">LEARN → REPRODUCE → RESEARCH</span>
+              <h2 data-i18n="learningHeading">把前沿方向变成可执行的学习与复现路径</h2>
+              <p data-i18n="learningIntro">基于当前方向和锚点论文，生成知识树、7/30/90 天计划、复现阶梯与最小研究假设。</p>
+            </div>
+            <span id="cloud-status" class="source-badge">—</span>
+          </div>
+          <div class="workbench-grid learning-layout">
+            <form id="learning-plan-form" class="panel workbench-form">
+              <h3 data-i18n="planSettings">学习计划设置</h3>
+              <label><span data-i18n="chooseDirection">前沿方向</span><select id="learning-direction" required></select></label>
+              <div class="form-row">
+                <label><span data-i18n="duration">周期</span><select id="learning-duration"><option value="7">7 days</option><option value="30" selected>30 days</option><option value="90">90 days</option></select></label>
+                <label><span data-i18n="weeklyHours">每周小时</span><input id="learning-hours" type="number" min="1" max="80" value="10"></label>
+              </div>
+              <label><span data-i18n="experience">当前基础</span><select id="learning-experience"><option value="beginner" data-i18n="beginner">入门</option><option value="intermediate" selected data-i18n="intermediate">中等</option><option value="advanced" data-i18n="advanced">进阶</option></select></label>
+              <label><span data-i18n="computeProfile">算力条件</span><select id="learning-compute"><option value="cpu_only" data-i18n="cpuOnly">纯 CPU</option><option value="single_gpu_or_cpu" selected data-i18n="singleGpu">单卡或 CPU</option><option value="multi_gpu" data-i18n="multiGpu">多卡</option><option value="cloud_flexible" data-i18n="cloudFlexible">弹性云资源</option></select></label>
+              <button class="primary-button" type="submit" data-i18n="generatePlan">生成学习计划</button>
+              <p class="form-help" data-i18n="mockHint">默认 mock 模式不产生费用；切换配置后由统一云端接口生成。</p>
+            </form>
+            <article id="learning-plan-output" class="panel workbench-result learning-output">
+              <div class="empty-state" data-i18n="noPlanYet">选择一个方向后生成计划。</div>
+            </article>
+          </div>
         </section>
 
         <section id="topics" class="page-section">
