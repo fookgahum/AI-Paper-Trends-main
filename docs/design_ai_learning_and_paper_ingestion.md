@@ -9,7 +9,7 @@
 
 ## 0. 当前实现边界（2026-07-18）
 
-本次实现完成了可独立运行的第一阶段：网页输入公开网址、JSON/HTML/ACL 解析、字段标准化、SQLite 去重、任务进度与错误记录、原始响应快照、可选 PDF 下载、已保存来源再次拉取；新增论文保持“未分析”，用户可单独启动 AI 方向更新，将论文映射到现有方向或保存新方向候选草稿，正式 13 个方向不会被自动改写；同时完成了方向知识树、7/30/90 天计划、锚点论文、L0–L4 复现阶梯、最小研究假设和学习进度写回。测试默认使用确定性 mock 客户端，不产生云端费用。
+本次实现完成了可独立运行的第一阶段：网页输入公开网址、JSON/HTML/ACL 解析、字段标准化、SQLite 去重、任务进度与错误记录、原始响应快照、可选 PDF 下载、已保存来源再次拉取；新增论文保持“未分析”，用户可单独启动 AI 方向更新，将论文映射到现有方向或保存新方向候选草稿，正式 13 个方向不会被自动改写；学习模块以知识边界为主，完成零基础缺口诊断、论文可读/研究就绪双路径、必备/可选知识、5 个能力关卡、分层依赖图、掌握检查、可靠起步资料及停止条件，再将其投影为 7/30/90 天计划，并保留锚点论文、L0–L4 复现阶梯、最小研究假设和进度写回。测试默认使用确定性 mock 客户端，不产生云端费用。
 
 真实云端调用只位于 `src/cloud_ai/client.py`，配置位于 `settings/cloud_ai.yaml`，密钥只从 `CLOUD_AI_API_KEY` 环境变量读取。把 `provider` 从 `mock` 改为 `openai_compatible` 并填写实际模型名后即可接入兼容 Chat Completions 的云端服务。
 
@@ -420,7 +420,7 @@ model: your-model-name
 api_key_env: CLOUD_AI_API_KEY
 timeout_seconds: 90
 temperature: 0.2
-prompt_version: learning-plan-v1
+prompt_version: knowledge-curriculum-v3
 ```
 
 密钥只从环境变量读取：
@@ -509,7 +509,7 @@ paper_content_hash + model + prompt_version + schema_version
 创建学习计划时收集：
 
 - `direction_id` 和方向版本。
-- 当前基础：入门、会深度学习、已有相关经验，或自定义描述。
+- 当前基础：零基础、入门、会深度学习、已有相关经验，或自定义描述。
 - 周期：7、30、90 天或自定义。
 - 每日可用时间。
 - 硬件：CPU、GPU 型号/显存、GPU 数量。
@@ -519,28 +519,28 @@ paper_content_hash + model + prompt_version + schema_version
 
 页面主按钮使用明确结果导向文案，例如：
 
-> 生成我的 30 天学习与复刻计划
+> 生成这个方向的知识路线
 
 ### 9.2 学习知识树
 
-知识树使用有向无环图（DAG），而不是无序知识点列表。
+学习产物先定义知识边界，再生成时间安排。边界必须说明起点假设、最终能力、必备和可选节点、暂时不用学习的内容、预计完整投入、所选周期可用时间以及是否现实。知识树使用有向无环图（DAG），而不是无序知识点列表。
 
 节点至少包含：
 
 ```json
 {
-  "node_id": "dense_retrieval",
+  "id": "dense_retrieval",
+  "category": "方向核心",
   "title": "Dense Retrieval",
-  "level": "method",
-  "prerequisite_ids": ["text_embedding", "similarity_metrics"],
+  "depth": "working",
+  "prerequisites": ["text_embedding", "similarity_metrics"],
   "why_required": "为什么该方向需要这个能力",
-  "learning_goal": "掌握后的可观察能力",
+  "what_to_learn": ["向量表示", "负样本", "召回与重排"],
+  "not_required": ["暂不实现分布式向量数据库"],
+  "mastery_checks": ["能解释召回失败并完成一个最小对照"],
+  "resource_queries": ["dense retrieval tutorial benchmark"],
   "estimated_hours": 6,
-  "materials": [],
-  "exercise": "最小代码练习",
-  "deliverables": [],
-  "acceptance_criteria": [],
-  "related_paper_ids": []
+  "evidence_paper_ids": []
 }
 ```
 
@@ -557,12 +557,17 @@ paper_content_hash + model + prompt_version + schema_version
 - 不存在循环依赖。
 - 所有前置节点必须存在。
 - 每个核心节点至少有练习和验收标准。
+- 每个节点明确“具体学什么”和“暂时不用学什么”，防止范围无限扩张。
+- 每个节点包含掌握检查和方向资料检索词。
+- 单独定义“论文可读最短路径”和“研究就绪完整路径”；最短路径必须包含全部依赖。
+- 必修节点被 3–5 个不重叠能力关卡完整覆盖，每关包含可观察的过关证据和常见假掌握。
+- 起步资料 URL 只能从服务端审核白名单选择；每份资料必须限定章节、用途和停止条件。
 - 每个前沿节点至少关联一篇本地论文。
 - 锚点论文需要的节点必须在计划中出现或被标记为已掌握。
 
 ### 9.3 7/30/90 天计划
 
-计划由知识树生成，不能绕过知识树直接生成自由文本日程。
+计划由知识树生成，不能绕过知识树直接生成自由文本日程。时间不足时必须分别提示距“论文可读”和“研究就绪”还差多少，不得为了凑 7/30/90 天删除必备知识节点；页面上时间计划作为可折叠的次级内容展示。学习推进以能力关卡为准，天数只用于估计节奏。
 
 每天/每个阶段至少包含：
 
@@ -1219,11 +1224,7 @@ python -m scripts.init_local_catalog --from-run data/web/ccfa_2026
 
 ## 20. 第一版建议范围
 
-为了先验证学习闭环，第一版云端学习只覆盖当前低资源档位优先的三个方向：
-
-1. LLM 安全、越狱检测与偏好对齐。
-2. RAG、深度检索与幻觉治理。
-3. 时序基础模型与领域适配。
+第一版云端学习已覆盖当前发布快照中的全部 13 个前沿方向。方向专属知识由云端模型结合本地代表论文生成；通用前置资料使用服务端 URL 白名单，避免模型虚构链接。
 
 每个方向交付：
 

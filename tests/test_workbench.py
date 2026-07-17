@@ -10,12 +10,18 @@ from pathlib import Path
 
 import httpx
 
-from src.cloud_ai.client import CloudAIConfig, OpenAICompatibleCloudAIClient
+from src.cloud_ai.client import (
+    CloudAIConfig,
+    MockCloudAIClient,
+    OpenAICompatibleCloudAIClient,
+)
+from src.cloud_ai.learning_service import LearningPlanService
 from src.cloud_ai.schemas import LearningPlanArtifact
 from src.paper_sources import FetchedDocument
 from src.paper_sources.service import parse_document
 from tests.test_web import _write_snapshot
 from web.app import create_app
+from web.result_store import ResultStore
 
 
 def _fake_fetch(url: str) -> FetchedDocument:
@@ -107,6 +113,10 @@ class WorkbenchApiTests(unittest.IsolatedAsyncioTestCase):
             [item.level for item in artifact.reproduction_ladder],
             ["L0", "L1", "L2", "L3", "L4"],
         )
+        self.assertGreaterEqual(len(artifact.knowledge_tree), 10)
+        self.assertTrue(artifact.knowledge_scope.must_learn_node_ids)
+        self.assertTrue(artifact.knowledge_scope.defer_topics)
+        self.assertTrue(artifact.gap_diagnosis)
 
         task_id = artifact.stages[0].tasks[0].id
         progress = await self.client.patch(
@@ -211,6 +221,114 @@ class PaperParserTests(unittest.TestCase):
         self.assertEqual(len(papers), 1)
         self.assertEqual(papers[0]["abstract"], "Full abstract.")
         self.assertEqual(papers[0]["authors"], ["A. Author"])
+
+
+class LearningCurriculumTests(unittest.TestCase):
+    def test_zero_foundation_curriculum_covers_all_published_directions(self) -> None:
+        project_root = Path(__file__).resolve().parents[1]
+        snapshot = ResultStore(project_root / "data" / "web").get_snapshot(
+            "ccfa_2026"
+        )
+        paper_by_id = {paper["id"]: paper for paper in snapshot.papers}
+        client = MockCloudAIClient()
+        for direction in snapshot.opportunities["directions"]:
+            grounded = {
+                **direction,
+                "representative_papers": [
+                    {**paper_by_id[paper["id"]], **paper}
+                    for paper in direction["representative_papers"]
+                ],
+            }
+            raw, _usage = client.generate_learning_plan(
+                {
+                    "direction": grounded,
+                    "request": {
+                        "language": "zh-CN",
+                        "duration_days": 30,
+                        "experience_level": "zero",
+                    },
+                }
+            )
+            artifact = LearningPlanArtifact.model_validate(raw)
+            self.assertIn("零基础", artifact.knowledge_scope.starting_point)
+            self.assertGreaterEqual(len(artifact.knowledge_tree), 12)
+            self.assertGreaterEqual(len(artifact.gap_diagnosis), 4)
+            self.assertEqual(len(artifact.mastery_milestones), 5)
+            self.assertGreaterEqual(len(artifact.starter_resources), 4)
+            self.assertLess(
+                artifact.knowledge_scope.minimum_viable_hours,
+                artifact.knowledge_scope.estimated_total_hours,
+            )
+            self.assertLess(
+                artifact.knowledge_scope.available_hours,
+                artifact.knowledge_scope.minimum_viable_hours,
+            )
+            self.assertEqual(artifact.knowledge_scope.feasibility, "unrealistic")
+            categories = {node.category for node in artifact.knowledge_tree}
+            self.assertEqual(
+                categories, {"基础前置", "方向核心", "论文与研究实践"}
+            )
+            for node in artifact.knowledge_tree:
+                self.assertTrue(node.what_to_learn)
+                self.assertTrue(node.mastery_checks)
+                self.assertTrue(node.resource_queries)
+            milestone_nodes = [
+                node_id
+                for milestone in artifact.mastery_milestones
+                for node_id in milestone.node_ids
+            ]
+            self.assertEqual(
+                set(milestone_nodes),
+                set(artifact.knowledge_scope.must_learn_node_ids),
+            )
+            self.assertEqual(len(milestone_nodes), len(set(milestone_nodes)))
+            self.assertTrue(
+                all(len(milestone.node_ids) <= 4 for milestone in artifact.mastery_milestones)
+            )
+            for resource in artifact.starter_resources:
+                self.assertTrue(resource.url.startswith("https://"))
+                self.assertTrue(resource.recommended_sections)
+                self.assertTrue(resource.stop_rule)
+
+    def test_learning_evidence_rejects_unverified_resource_url(self) -> None:
+        project_root = Path(__file__).resolve().parents[1]
+        snapshot = ResultStore(project_root / "data" / "web").get_snapshot(
+            "ccfa_2026"
+        )
+        direction = snapshot.opportunities["directions"][0]
+        paper_by_id = {paper["id"]: paper for paper in snapshot.papers}
+        grounded = {
+            **direction,
+            "representative_papers": [
+                {**paper_by_id[paper["id"]], **paper}
+                for paper in direction["representative_papers"]
+            ],
+        }
+        raw, _usage = MockCloudAIClient().generate_learning_plan(
+            {
+                "direction": grounded,
+                "request": {
+                    "language": "zh-CN",
+                    "duration_days": 30,
+                    "experience_level": "zero",
+                },
+            }
+        )
+        artifact = LearningPlanArtifact.model_validate(raw)
+        context = {
+            "direction": grounded,
+            "verified_resource_catalog": [
+                {"url": resource.url} for resource in artifact.starter_resources
+            ],
+        }
+        LearningPlanService._validate_evidence(artifact, context)
+        invalid_payload = artifact.model_dump(mode="json")
+        invalid_payload["starter_resources"][0]["url"] = (
+            "https://unverified.example.test/course"
+        )
+        invalid_artifact = LearningPlanArtifact.model_validate(invalid_payload)
+        with self.assertRaisesRegex(ValueError, "unverified starter-resource"):
+            LearningPlanService._validate_evidence(invalid_artifact, context)
 
 
 if __name__ == "__main__":

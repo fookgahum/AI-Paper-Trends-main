@@ -4,4 +4,4 @@ base_url: https://api.openai.com/v1
 api_key_env: CLOUD_AI_API_KEY
 timeout_seconds: 90
 temperature: 0.2
-prompt_version: learning-plan-v1
+prompt_version: knowledge-curriculum-v3

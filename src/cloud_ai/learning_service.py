@@ -8,7 +8,11 @@ from datetime import datetime, timezone
 from threading import Event, Thread
 from typing import Any, Dict
 
-from src.cloud_ai.client import CloudAIClient, CloudAIConfig
+from src.cloud_ai.client import (
+    CloudAIClient,
+    CloudAIConfig,
+    verified_resource_catalog,
+)
 from src.cloud_ai.schemas import LearningPlanArtifact
 from src.storage import LocalDatabase
 from web.result_store import ResultStore, ResultStoreError
@@ -124,6 +128,9 @@ class LearningPlanService:
         generated_at = snapshot.manifest.get("generated_at")
         return {
             "output_contract": LearningPlanArtifact.model_json_schema(),
+            "verified_resource_catalog": verified_resource_catalog(
+                direction["id"], payload["language"]
+            ),
             "direction": grounded_direction,
             "direction_version": f"{payload['run_id']}:{generated_at or 'unknown'}",
             "paper_cutoff": generated_at or datetime.now(timezone.utc).isoformat(),
@@ -148,6 +155,21 @@ class LearningPlanService:
         generated = {paper.paper_id for paper in artifact.anchor_papers}
         if generated - allowed:
             raise ValueError("AI output invented an anchor paper id")
+        knowledge_evidence = {
+            paper_id
+            for node in artifact.knowledge_tree
+            for paper_id in node.evidence_paper_ids
+        }
+        if knowledge_evidence - allowed:
+            raise ValueError("AI output invented knowledge-node evidence paper ids")
+        allowed_resource_urls = {
+            resource["url"] for resource in context["verified_resource_catalog"]
+        }
+        generated_resource_urls = {
+            resource.url for resource in artifact.starter_resources
+        }
+        if generated_resource_urls - allowed_resource_urls:
+            raise ValueError("AI output invented an unverified starter-resource URL")
 
     def _heartbeat_while_generating(self, job_id: str, stop: Event) -> None:
         while not stop.wait(10):

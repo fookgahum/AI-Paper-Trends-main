@@ -13,11 +13,64 @@ class StrictModel(BaseModel):
 
 class KnowledgeNode(StrictModel):
     id: str = Field(min_length=1)
+    category: str = Field(min_length=1)
+    depth: str = Field(pattern=r"^(awareness|working|implementation|research)$")
     title: str = Field(min_length=1)
-    reason: str = Field(min_length=1)
+    why_required: str = Field(min_length=1)
+    what_to_learn: List[str] = Field(min_length=1)
+    not_required: List[str] = Field(default_factory=list)
     prerequisites: List[str] = Field(default_factory=list)
-    deliverable: str = Field(min_length=1)
+    mastery_checks: List[str] = Field(min_length=1)
+    resource_queries: List[str] = Field(min_length=1)
+    evidence_paper_ids: List[str] = Field(default_factory=list)
     estimated_hours: float = Field(gt=0)
+
+
+class KnowledgeGap(StrictModel):
+    area: str = Field(min_length=1)
+    current_assumption: str = Field(min_length=1)
+    target_level: str = Field(min_length=1)
+    diagnostic_questions: List[str] = Field(min_length=1)
+    bridge_node_ids: List[str] = Field(min_length=1)
+
+
+class LearningResource(StrictModel):
+    id: str = Field(min_length=1)
+    title: str = Field(min_length=1)
+    provider: str = Field(min_length=1)
+    resource_type: str = Field(min_length=1)
+    url: str = Field(pattern=r"^https://")
+    language: str = Field(min_length=1)
+    node_ids: List[str] = Field(min_length=1)
+    recommended_sections: List[str] = Field(min_length=1)
+    purpose: str = Field(min_length=1)
+    stop_rule: str = Field(min_length=1)
+
+
+class MasteryMilestone(StrictModel):
+    id: str = Field(min_length=1)
+    title: str = Field(min_length=1)
+    node_ids: List[str] = Field(min_length=1)
+    capability: str = Field(min_length=1)
+    gate_checks: List[str] = Field(min_length=1)
+    common_failures: List[str] = Field(min_length=1)
+    estimated_hours: float = Field(gt=0)
+
+
+class KnowledgeScope(StrictModel):
+    starting_point: str = Field(min_length=1)
+    target_capability: str = Field(min_length=1)
+    must_learn_node_ids: List[str] = Field(min_length=1)
+    optional_node_ids: List[str] = Field(default_factory=list)
+    minimum_viable_node_ids: List[str] = Field(min_length=1)
+    research_ready_node_ids: List[str] = Field(min_length=1)
+    defer_topics: List[str] = Field(min_length=1)
+    exit_criteria: List[str] = Field(min_length=1)
+    minimum_viable_hours: float = Field(gt=0)
+    estimated_total_hours: float = Field(gt=0)
+    available_hours: float = Field(gt=0)
+    feasibility: str = Field(pattern=r"^(unrealistic|tight|feasible)$")
+    projection_note: str = Field(min_length=1)
 
 
 class LearningTask(StrictModel):
@@ -109,7 +162,11 @@ class LearningPlanArtifact(StrictModel):
     direction_title: str = Field(min_length=1)
     executive_summary: str = Field(min_length=1)
     duration_days: int = Field(gt=0)
-    knowledge_tree: List[KnowledgeNode] = Field(min_length=1)
+    knowledge_scope: KnowledgeScope
+    gap_diagnosis: List[KnowledgeGap] = Field(min_length=1)
+    knowledge_tree: List[KnowledgeNode] = Field(min_length=6)
+    mastery_milestones: List[MasteryMilestone] = Field(min_length=3)
+    starter_resources: List[LearningResource] = Field(min_length=4)
     stages: List[PlanStage] = Field(min_length=1)
     anchor_papers: List[AnchorPaper] = Field(min_length=1)
     reproduction_ladder: List[ReproductionLevel] = Field(min_length=5, max_length=5)
@@ -126,6 +183,50 @@ class LearningPlanArtifact(StrictModel):
             if unknown:
                 raise ValueError(f"unknown knowledge prerequisites: {sorted(unknown)}")
         self._validate_acyclic({node.id: node.prerequisites for node in self.knowledge_tree})
+        must_learn = set(self.knowledge_scope.must_learn_node_ids)
+        optional = set(self.knowledge_scope.optional_node_ids)
+        if must_learn - known or optional - known:
+            raise ValueError("knowledge scope references an unknown node")
+        if must_learn & optional:
+            raise ValueError("a knowledge node cannot be both required and optional")
+        minimum_viable = set(self.knowledge_scope.minimum_viable_node_ids)
+        research_ready = set(self.knowledge_scope.research_ready_node_ids)
+        if minimum_viable - must_learn:
+            raise ValueError("minimum viable path must contain only required nodes")
+        if research_ready != must_learn:
+            raise ValueError("research-ready path must match the required knowledge boundary")
+        if self.knowledge_scope.minimum_viable_hours > self.knowledge_scope.estimated_total_hours:
+            raise ValueError("minimum viable path cannot take longer than the research-ready path")
+        for node in self.knowledge_tree:
+            if node.id in minimum_viable and set(node.prerequisites) - minimum_viable:
+                raise ValueError("minimum viable path must include every node prerequisite")
+        for gap in self.gap_diagnosis:
+            if set(gap.bridge_node_ids) - known:
+                raise ValueError("knowledge gap references an unknown bridge node")
+        milestone_ids: set[str] = set()
+        milestone_node_ids: list[str] = []
+        for milestone in self.mastery_milestones:
+            if milestone.id in milestone_ids:
+                raise ValueError("mastery milestone ids must be unique")
+            milestone_ids.add(milestone.id)
+            if set(milestone.node_ids) - known:
+                raise ValueError("mastery milestone references an unknown node")
+            milestone_node_ids.extend(milestone.node_ids)
+        if len(milestone_node_ids) != len(set(milestone_node_ids)):
+            raise ValueError("a knowledge node cannot appear in multiple mastery milestones")
+        if must_learn - set(milestone_node_ids):
+            raise ValueError("mastery milestones must cover every required node")
+        resource_ids: set[str] = set()
+        resource_urls: set[str] = set()
+        for resource in self.starter_resources:
+            if resource.id in resource_ids:
+                raise ValueError("starter resource ids must be unique")
+            resource_ids.add(resource.id)
+            if resource.url in resource_urls:
+                raise ValueError("starter resource URLs must be unique")
+            resource_urls.add(resource.url)
+            if set(resource.node_ids) - known:
+                raise ValueError("starter resource references an unknown node")
 
         ordered_stages = sorted(self.stages, key=lambda stage: stage.day_start)
         expected_start = 1

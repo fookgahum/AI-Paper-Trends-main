@@ -225,7 +225,7 @@
             <div>
               <span class="eyebrow" data-i18n="learningEyebrow">LEARN → REPRODUCE → RESEARCH</span>
               <h2 data-i18n="learningHeading">把前沿方向变成可执行的学习与复现路径</h2>
-              <p data-i18n="learningIntro">基于当前方向和锚点论文，生成知识树、7/30/90 天计划、复现阶梯与最小研究假设。</p>
+              <p data-i18n="learningIntro">先圈定必须掌握的知识、前置缺口和学习边界，再把知识地图投影成 7/30/90 天安排。</p>
             </div>
             <span id="cloud-status" class="source-badge">—</span>
           </div>
@@ -237,10 +237,10 @@
                 <label><span data-i18n="duration">周期</span><select id="learning-duration"><option value="7">7 days</option><option value="30" selected>30 days</option><option value="90">90 days</option></select></label>
                 <label><span data-i18n="weeklyHours">每周小时</span><input id="learning-hours" type="number" min="1" max="80" value="10"></label>
               </div>
-              <label><span data-i18n="experience">当前基础</span><select id="learning-experience"><option value="beginner" data-i18n="beginner">入门</option><option value="intermediate" selected data-i18n="intermediate">中等</option><option value="advanced" data-i18n="advanced">进阶</option></select></label>
+              <label><span data-i18n="experience">当前基础</span><select id="learning-experience"><option value="zero" data-i18n="zeroFoundation">零基础</option><option value="beginner" data-i18n="beginner">入门</option><option value="intermediate" selected data-i18n="intermediate">中等</option><option value="advanced" data-i18n="advanced">进阶</option></select></label>
               <label><span data-i18n="computeProfile">算力条件</span><select id="learning-compute"><option value="cpu_only" data-i18n="cpuOnly">纯 CPU</option><option value="single_gpu_or_cpu" selected data-i18n="singleGpu">单卡或 CPU</option><option value="multi_gpu" data-i18n="multiGpu">多卡</option><option value="cloud_flexible" data-i18n="cloudFlexible">弹性云资源</option></select></label>
               <button class="primary-button" type="submit" data-i18n="generatePlan">生成学习计划</button>
-              <p class="form-help" data-i18n="mockHint">默认 mock 模式不产生费用；切换配置后由统一云端接口生成。</p>
+              <p class="form-help" data-i18n="mockHint">学习周期只影响节奏，不改变必须掌握的知识边界。默认 mock 模式不产生费用。</p>
             </form>
             <article id="learning-plan-output" class="panel workbench-result learning-output">
               <div class="empty-state" data-i18n="noPlanYet">选择一个方向后生成计划。</div>

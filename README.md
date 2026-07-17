@@ -16,7 +16,7 @@ AI Paper Trends is a local research dashboard and reproducible analysis pipeline
 - Rebuild the included 2026 dataset from official ICLR, ICML, and ACL sources.
 - Pull incremental papers from a public JSON/HTML/ACL Anthology URL, normalize fields, deduplicate in SQLite, save source snapshots, and optionally download public PDFs without invoking AI.
 - Manually run an AI direction-update job after pulling: map new papers to an existing direction or save an evidence-grounded new-direction candidate as a draft, without changing the 13 published directions.
-- Generate a validated knowledge tree, 7/30/90-day plan, grounded anchor papers, an L0-L4 reproduction ladder, and minimum research hypotheses.
+- Generate a prerequisite-aware curriculum boundary first: starting gaps, required and optional knowledge, dependency order, explicit deferrals, mastery checks, resource-search terms, grounded anchor papers, and research exit criteria. The 7/30/90-day plan is a secondary projection of that map.
 - Run the complete learning workflow for free with the deterministic mock client, or switch one configuration file to an OpenAI-compatible cloud API.
 
 ## Included 2026 web dataset
@@ -58,6 +58,10 @@ New papers remain `unanalysed` until you explicitly click **Analyse new papers w
 
 ## AI learning plans and the cloud API boundary
 
+The learning page is knowledge-first. Selecting **Zero foundation** produces a layered route through programming/experiment engineering, mathematics and statistics, ML/Transformer foundations, direction-specific core concepts, paper evidence reading, baseline reproduction, and research design. It separates a shortest “structured paper literacy” path from the full “independent reproduction and research design” path, with five capability gates, passing evidence, and false-mastery traps. Starter materials come from a reviewed URL allowlist and prescribe only selected sections plus a stop rule. The full map, gap diagnosis, research exit, and calendar are folded away so a novice first sees only what Gate 1 requires.
+
+If the selected duration is too short, the site reports the available hours against both capability thresholds instead of deleting required knowledge or pretending mastery.
+
 The default [`settings/cloud_ai.yaml`](settings/cloud_ai.yaml) uses `provider: mock`, so the website and tests make no paid request. The only real cloud request implementation is [`src/cloud_ai/client.py`](src/cloud_ai/client.py). To use an OpenAI-compatible Chat Completions service:
 
 1. Change `provider` to `openai_compatible`, set the service `base_url`, and set the actual `model` in `settings/cloud_ai.yaml`.
@@ -68,7 +72,7 @@ $env:CLOUD_AI_API_KEY = "your-key"
 python -m uvicorn web.app:app --host 127.0.0.1 --port 8000
 ```
 
-The returned JSON must pass the local Pydantic contract: valid dependency DAG, contiguous plan stages, grounded anchor-paper IDs, measurable deliverables, and an ordered L0-L4 reproduction ladder. A malformed cloud response is recorded as a failed job and is not published as a plan.
+The returned JSON must pass the local Pydantic contract: a valid dependency DAG, a prerequisite-closed minimum path, non-overlapping mastery gates covering every required node, grounded paper IDs, starter URLs drawn only from the server allowlist, contiguous plan stages, measurable deliverables, and an ordered L0-L4 reproduction ladder. A malformed cloud response is recorded as a failed job and is not published as a plan.
 
 ## Rebuild the 2026 dataset
 

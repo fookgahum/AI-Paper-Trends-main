@@ -23,7 +23,7 @@ class LearningPlanRequest(BaseModel):
     direction_id: str = Field(min_length=1, max_length=120)
     duration_days: Literal[7, 30, 90] = 30
     language: Literal["zh-CN", "en-US"] = "zh-CN"
-    experience_level: Literal["beginner", "intermediate", "advanced"] = "intermediate"
+    experience_level: Literal["zero", "beginner", "intermediate", "advanced"] = "intermediate"
     weekly_hours: int = Field(default=10, ge=1, le=80)
     compute_profile: Literal[
         "cpu_only", "single_gpu_or_cpu", "multi_gpu", "cloud_flexible"
