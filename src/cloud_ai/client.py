@@ -37,6 +37,10 @@ class CloudAIClient(Protocol):
         self, context: Dict[str, Any]
     ) -> Tuple[Dict[str, Any], Dict[str, int]]: ...
 
+    def analyze_paper(
+        self, context: Dict[str, Any]
+    ) -> Tuple[Dict[str, Any], Dict[str, int]]: ...
+
 
 def load_cloud_config(path: Path) -> CloudAIConfig:
     payload = yaml.safe_load(path.read_text(encoding="utf-8")) or {}
@@ -96,6 +100,21 @@ class OpenAICompatibleCloudAIClient:
             "Map every supplied paper to an existing direction when evidence is strong. "
             "Otherwise set direction_id to null and create a grounded new-direction "
             "candidate. Do not invent paper or direction ids.",
+        )
+
+    def analyze_paper(
+        self, context: Dict[str, Any]
+    ) -> Tuple[Dict[str, Any], Dict[str, int]]:
+        return self._request_json(
+            context,
+            "Create a progressive, evidence-grounded close reading of one paper. Every "
+            "substantive item must cite supplied chunk ids. Copy evidence excerpts exactly "
+            "from those chunks and preserve their page and section. Separate author claims, "
+            "AI synthesis, and items needing verification. If document_status is "
+            "abstract_only, do not claim detailed experiments, equations, ablations, or "
+            "reproduction facts. Produce a three-minute brief, reading route, logic chain, "
+            "method data flow, evidence audit, bounded prerequisites, L0-L3 reproduction "
+            "route, active-recall checks, and cautious research extensions.",
         )
 
     def _request_json(
@@ -345,6 +364,13 @@ class MockCloudAIClient:
             ),
         }
         return artifact, {"input_tokens": 0, "output_tokens": 0}
+
+    def analyze_paper(
+        self, context: Dict[str, Any]
+    ) -> Tuple[Dict[str, Any], Dict[str, int]]:
+        from src.paper_analysis.mock_analyzer import build_mock_paper_analysis
+
+        return build_mock_paper_analysis(context)
 
 
 def _localized(value: Any, language: str) -> Any:

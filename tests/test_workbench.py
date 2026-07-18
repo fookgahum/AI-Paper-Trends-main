@@ -17,6 +17,9 @@ from src.cloud_ai.client import (
 )
 from src.cloud_ai.learning_service import LearningPlanService
 from src.cloud_ai.schemas import LearningPlanArtifact
+from src.paper_analysis.document_service import chunk_pages, resolve_pdf_url
+from src.paper_analysis.schemas import PaperAnalysisArtifact
+from src.paper_analysis.service import _select_document_chunks
 from src.paper_sources import FetchedDocument
 from src.paper_sources.service import parse_document
 from tests.test_web import _write_snapshot
@@ -44,6 +47,33 @@ def _fake_fetch(url: str) -> FetchedDocument:
         content=json.dumps(payload).encode("utf-8"),
         content_type="application/json",
     )
+
+
+def _minimal_pdf() -> bytes:
+    objects = [
+        "1 0 obj\n<< /Type /Catalog /Pages 2 0 R >>\nendobj\n",
+        "2 0 obj\n<< /Type /Pages /Kids [3 0 R] /Count 1 >>\nendobj\n",
+        "3 0 obj\n<< /Type /Page /Parent 2 0 R /MediaBox [0 0 612 792] /Resources << /Font << /F1 5 0 R >> >> /Contents 4 0 R >>\nendobj\n",
+        "4 0 obj\n<< /Length 178 >>\nstream\nBT /F1 11 Tf 72 720 Td (1 Introduction) Tj 0 -20 Td (We propose a graph method for reliable evaluation.) Tj 0 -20 Td (Experiments show improvements over a strong baseline.) Tj ET\nendstream\nendobj\n",
+        "5 0 obj\n<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica >>\nendobj\n",
+    ]
+    content = b"%PDF-1.4\n"
+    offsets = []
+    for item in objects:
+        offsets.append(len(content))
+        content += item.encode("ascii")
+    xref = len(content)
+    content += f"xref\n0 {len(objects) + 1}\n0000000000 65535 f \n".encode()
+    for offset in offsets:
+        content += f"{offset:010d} 00000 n \n".encode()
+    return content + (
+        f"trailer\n<< /Size {len(objects) + 1} /Root 1 0 R >>\n"
+        f"startxref\n{xref}\n%%EOF\n"
+    ).encode()
+
+
+def _fake_pdf_fetch(url: str) -> FetchedDocument:
+    return FetchedDocument(url=url, content=_minimal_pdf(), content_type="application/pdf")
 
 
 class WorkbenchApiTests(unittest.IsolatedAsyncioTestCase):
@@ -161,6 +191,136 @@ class WorkbenchApiTests(unittest.IsolatedAsyncioTestCase):
         self.assertEqual(response.json()["provider"], "mock")
         self.assertTrue(response.json()["configured"])
         self.assertEqual(response.json()["learning_artifact_version"], 3)
+        self.assertEqual(response.json()["paper_analysis_artifact_version"], 1)
+
+    async def test_mock_paper_analysis_is_grounded_and_assesses_mastery(self) -> None:
+        created = await self.client.post(
+            "/api/paper-analyses",
+            json={
+                "run_id": "demo",
+                "paper_id": "paper-a",
+                "language": "zh-CN",
+                "experience_level": "zero",
+                "reading_goal": "deep",
+                "math_depth": "intuition",
+                "compute_profile": "cpu_only",
+                "prefer_full_text": False,
+            },
+        )
+        self.assertEqual(created.status_code, 202)
+        job = await self.client.get(f"/api/jobs/{created.json()['job_id']}")
+        self.assertEqual(job.json()["status"], "completed", job.json())
+        analysis_id = job.json()["result"]["analysis_id"]
+        response = await self.client.get(f"/api/paper-analyses/{analysis_id}")
+        artifact = PaperAnalysisArtifact.model_validate(response.json()["artifact"])
+        self.assertEqual(artifact.paper_id, "paper-a")
+        self.assertEqual(artifact.document_status, "abstract_only")
+        self.assertTrue(artifact.warnings)
+        self.assertTrue(
+            all(item.strength != "supported" for item in artifact.experiment_review)
+        )
+        source_chunks = {item.chunk_id for item in artifact.evidence}
+        self.assertEqual(source_chunks, {"abstract-1"})
+
+        check_id = artifact.mastery_checks[0].id
+        incomplete = await self.client.post(
+            f"/api/paper-analyses/{analysis_id}/checks/{check_id}",
+            json={"answer": "这篇论文看起来不错，但我还没有说清楚。"},
+        )
+        self.assertEqual(incomplete.status_code, 200, incomplete.text)
+        self.assertEqual(incomplete.json()["progress"][0]["status"], "needs_review")
+
+        assessed = await self.client.post(
+            f"/api/paper-analyses/{analysis_id}/checks/{check_id}",
+            json={
+                "answer": "具体问题是语言模型治理；方法是按语言自由度调整水印强度；结果是在多种语言上报告更强的检测鲁棒性，但仍需回到原文核查实验边界。"
+            },
+        )
+        self.assertEqual(assessed.status_code, 200, assessed.text)
+        self.assertEqual(assessed.json()["progress"][0]["status"], "passed")
+
+        history = await self.client.get(
+            "/api/papers/paper-a/analyses", params={"run_id": "demo"}
+        )
+        self.assertEqual(history.json()["items"][0]["id"], analysis_id)
+
+    async def test_full_text_paper_analysis_serves_grounded_pdf(self) -> None:
+        app = create_app(
+            self.root,
+            local_root=self.root / "pdf-local",
+            paper_document_fetch=_fake_pdf_fetch,
+        )
+        async with httpx.AsyncClient(
+            transport=httpx.ASGITransport(app=app), base_url="http://testserver"
+        ) as client:
+            created = await client.post(
+                "/api/paper-analyses",
+                json={
+                    "run_id": "demo",
+                    "paper_id": "paper-a",
+                    "language": "en-US",
+                    "experience_level": "beginner",
+                    "reading_goal": "reproduce",
+                    "math_depth": "formula",
+                    "compute_profile": "cpu_only",
+                    "prefer_full_text": True,
+                },
+            )
+            job = await client.get(f"/api/jobs/{created.json()['job_id']}")
+            self.assertEqual(job.json()["status"], "completed", job.json())
+            self.assertEqual(job.json()["result"]["document_status"], "full_text")
+            self.assertEqual(job.json()["result"]["page_count"], 1)
+            analysis_id = job.json()["result"]["analysis_id"]
+            analysis = await client.get(f"/api/paper-analyses/{analysis_id}")
+            artifact = PaperAnalysisArtifact.model_validate(
+                analysis.json()["artifact"]
+            )
+            self.assertTrue(all(item.page == 1 for item in artifact.evidence))
+            pdf = await client.get(f"/api/paper-analyses/{analysis_id}/pdf")
+            self.assertEqual(pdf.status_code, 200)
+            self.assertTrue(pdf.content.startswith(b"%PDF"))
+
+
+class PaperDocumentTests(unittest.TestCase):
+    def test_resolves_supported_official_pdf_urls(self) -> None:
+        self.assertEqual(
+            resolve_pdf_url(
+                {"source_url": "https://aclanthology.org/2026.acl-long.12/"}
+            ),
+            "https://aclanthology.org/2026.acl-long.12.pdf",
+        )
+        self.assertEqual(
+            resolve_pdf_url(
+                {"source_url": "https://openreview.net/forum?id=paper123"}
+            ),
+            "https://openreview.net/pdf?id=paper123",
+        )
+
+    def test_chunks_keep_page_and_section_grounding(self) -> None:
+        chunks = chunk_pages(
+            [
+                "1 Introduction\nThis paper studies a problem. We propose a method.",
+                "2 Experiments\nResults improve the baseline. Limitations remain.",
+            ],
+            target_chars=40,
+        )
+        self.assertEqual(chunks[0]["page"], 1)
+        self.assertTrue(all(item["id"].startswith("p") for item in chunks))
+        self.assertTrue(any(item["page"] == 2 for item in chunks))
+
+    def test_long_paper_selection_covers_results_and_conclusion(self) -> None:
+        chunks = [
+            {"id": f"c{index}", "page": index + 1, "section": "Body", "text": "body"}
+            for index in range(160)
+        ]
+        chunks[120]["text"] = "Experiments and ablation results"
+        chunks[150]["text"] = "Limitations and conclusion"
+        selected = _select_document_chunks(chunks, limit=40)
+        ids = {item["id"] for item in selected}
+        self.assertIn("c0", ids)
+        self.assertIn("c120", ids)
+        self.assertIn("c150", ids)
+        self.assertIn("c159", ids)
 
 
 class CloudBoundaryTests(unittest.TestCase):

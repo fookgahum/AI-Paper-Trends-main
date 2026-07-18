@@ -62,6 +62,7 @@ def _write_snapshot(root: Path) -> None:
                 "en-US": "Graph systems",
             },
             "source_url": "https://example.test/a",
+            "pdf_url": "https://example.test/a.pdf",
         },
         {
             "id": "paper-b",

@@ -6,9 +6,11 @@ import os
 from typing import Literal, Optional
 
 from fastapi import APIRouter, BackgroundTasks, HTTPException, Query, Request, status
+from fastapi.responses import FileResponse
 from pydantic import AnyHttpUrl, BaseModel, Field
 
 from src.cloud_ai.schemas import LEARNING_ARTIFACT_VERSION
+from src.paper_analysis.schemas import PAPER_ANALYSIS_ARTIFACT_VERSION
 
 
 class PaperPullRequest(BaseModel):
@@ -44,6 +46,24 @@ class ProgressRequest(BaseModel):
     actual_hours: Optional[float] = Field(default=None, ge=0, le=10000)
 
 
+class PaperAnalysisRequest(BaseModel):
+    run_id: str = Field(min_length=1, max_length=120)
+    paper_id: str = Field(min_length=1, max_length=240)
+    language: Literal["zh-CN", "en-US"] = "zh-CN"
+    experience_level: Literal["zero", "beginner", "intermediate", "advanced"] = "beginner"
+    reading_goal: Literal["quick", "deep", "reproduce"] = "deep"
+    math_depth: Literal["intuition", "formula", "derivation"] = "intuition"
+    compute_profile: Literal[
+        "cpu_only", "single_gpu_or_cpu", "multi_gpu", "cloud_flexible"
+    ] = "single_gpu_or_cpu"
+    prefer_full_text: bool = True
+    force_refresh: bool = False
+
+
+class MasteryAnswerRequest(BaseModel):
+    answer: str = Field(min_length=1, max_length=8000)
+
+
 def create_workbench_router() -> APIRouter:
     router = APIRouter(prefix="/api")
 
@@ -58,6 +78,7 @@ def create_workbench_router() -> APIRouter:
             "api_key_env": config.api_key_env,
             "prompt_version": config.prompt_version,
             "learning_artifact_version": LEARNING_ARTIFACT_VERSION,
+            "paper_analysis_artifact_version": PAPER_ANALYSIS_ARTIFACT_VERSION,
         }
 
     @router.post("/paper-pulls", status_code=status.HTTP_202_ACCEPTED)
@@ -167,5 +188,60 @@ def create_workbench_router() -> APIRouter:
             return request.app.state.local_database.get_learning_plan(plan_id)
         except KeyError as error:
             raise HTTPException(status_code=404, detail=str(error)) from error
+
+    @router.post("/paper-analyses", status_code=status.HTTP_202_ACCEPTED)
+    async def create_paper_analysis(
+        payload: PaperAnalysisRequest,
+        background_tasks: BackgroundTasks,
+        request: Request,
+    ) -> dict:
+        values = payload.model_dump(mode="json")
+        service = request.app.state.paper_analysis_service
+        job_id = service.create_job(values)
+        background_tasks.add_task(service.run_job, job_id, values)
+        return {"job_id": job_id}
+
+    @router.get("/paper-analyses/{analysis_id}")
+    async def get_paper_analysis(analysis_id: str, request: Request) -> dict:
+        try:
+            return request.app.state.local_database.get_paper_analysis(analysis_id)
+        except KeyError as error:
+            raise HTTPException(status_code=404, detail=str(error)) from error
+
+    @router.get("/papers/{paper_id}/analyses")
+    async def list_paper_analyses(
+        paper_id: str, request: Request, run_id: str = Query(min_length=1)
+    ) -> dict:
+        items = request.app.state.local_database.list_paper_analyses(run_id, paper_id)
+        return {"items": items}
+
+    @router.post("/paper-analyses/{analysis_id}/checks/{check_id}")
+    async def evaluate_paper_mastery(
+        analysis_id: str,
+        check_id: str,
+        payload: MasteryAnswerRequest,
+        request: Request,
+    ) -> dict:
+        try:
+            return request.app.state.paper_analysis_service.evaluate_mastery(
+                analysis_id, check_id, payload.answer
+            )
+        except KeyError as error:
+            raise HTTPException(status_code=404, detail=str(error)) from error
+        except ValueError as error:
+            raise HTTPException(status_code=422, detail=str(error)) from error
+
+    @router.get("/paper-analyses/{analysis_id}/pdf", response_class=FileResponse)
+    async def get_paper_analysis_pdf(
+        analysis_id: str, request: Request
+    ) -> FileResponse:
+        try:
+            analysis = request.app.state.local_database.get_paper_analysis(analysis_id)
+            path = request.app.state.paper_document_service.pdf_path(
+                analysis["document_id"]
+            )
+        except (KeyError, FileNotFoundError) as error:
+            raise HTTPException(status_code=404, detail=str(error)) from error
+        return FileResponse(path, media_type="application/pdf", filename=path.name)
 
     return router

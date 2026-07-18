@@ -17,6 +17,7 @@ AI Paper Trends is a local research dashboard and reproducible analysis pipeline
 - Pull incremental papers from a public JSON/HTML/ACL Anthology URL, normalize fields, deduplicate in SQLite, save source snapshots, and optionally download public PDFs without invoking AI.
 - Manually run an AI direction-update job after pulling: map new papers to an existing direction or save an evidence-grounded new-direction candidate as a draft, without changing the 13 published directions.
 - Generate a prerequisite-aware curriculum boundary first: starting gaps, required and optional knowledge, dependency order, explicit deferrals, mastery checks, resource-search terms, grounded anchor papers, and research exit criteria. The 7/30/90-day plan is a secondary projection of that map.
+- Close-read one selected paper with a three-minute brief, page-grounded logic and method breakdown, experimental-evidence audit, paper-specific prerequisite boundary, L0-L3 reproduction route, active-recall assessment, and cautious research extensions. Public ACL/OpenReview PDFs are parsed when available; failures downgrade visibly to abstract-only analysis.
 - Run the complete learning workflow for free with the deterministic mock client, or switch one configuration file to an OpenAI-compatible cloud API.
 
 ## Included 2026 web dataset
@@ -57,6 +58,12 @@ python -m scripts.pull_papers "https://example.org/papers.json" --conference DEM
 The first implementation supports common JSON feeds (including OpenReview-style `notes` payloads), ACL Anthology event pages, and proceedings-style HTML whose paper cards contain abstracts. Unsupported page layouts fail visibly and retain a job error instead of silently importing incomplete records.
 
 New papers remain `unanalysed` until you explicitly click **Analyse new papers with AI**. The resulting mappings and new-direction candidates are durable drafts in SQLite. This makes the “new 2026 direction” path updateable while keeping the published snapshot stable and reviewable.
+
+## Single-paper AI close reading
+
+Open **Papers**, inspect one paper, and choose **AI close-read this paper**. The system derives the official public PDF URL for ACL Anthology and OpenReview papers, stores the PDF only under Git-ignored `data/local/artifacts/`, extracts page-preserving chunks, and validates every generated evidence id, page, section, and excerpt against that local document. If a PDF is unavailable or has no extractable text, the artifact is explicitly restricted to title and abstract and cannot claim supported experiments.
+
+The result is progressive rather than one long summary: a three-minute brief, recommended reading order, problem-to-conclusion logic chain, input/process/output method modules, experimental cautions, a bounded knowledge map, an L0-L3 minimum reproduction route, active-recall answers with feedback, and research extensions that state novelty risk and a minimum experiment. Repeated analyses and mastery progress are stored in `data/local/app.db`; cached PDFs can be reopened at their cited page.
 
 ## AI learning plans and the cloud API boundary
 
@@ -124,6 +131,7 @@ docs/                     Architecture and product design notes
 scripts/                  Official builds and the URL paper-pull CLI
 settings/cloud_ai.yaml     Cloud provider/model settings without secrets
 src/cloud_ai/              Validated mock/real AI boundary and learning service
+src/paper_analysis/        Public-PDF parsing, grounded close reading, and mastery checks
 src/paper_sources/         URL parsing, normalization, deduplication, and PDF pull
 src/storage/               Local SQLite schema and application queries
 src/get_papers.py         OpenReview ingestion

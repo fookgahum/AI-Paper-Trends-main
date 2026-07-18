@@ -19,6 +19,7 @@ from src.cloud_ai import (
     load_cloud_config,
 )
 from src.cloud_ai.client import CloudAIClient
+from src.paper_analysis import PaperAnalysisService, PaperDocumentService
 from src.paper_sources import FetchedDocument, PaperPullService
 from src.storage import LocalDatabase
 from web.result_store import ResultStore, ResultStoreError
@@ -36,6 +37,7 @@ def create_app(
     cloud_config: Optional[CloudAIConfig] = None,
     cloud_client: Optional[CloudAIClient] = None,
     paper_fetch: Optional[Callable[[str], FetchedDocument]] = None,
+    paper_document_fetch: Optional[Callable[[str], FetchedDocument]] = None,
     initialize_immediately: bool = True,
 ) -> FastAPI:
     """Create the dashboard and its local ingestion/learning workbench."""
@@ -62,8 +64,16 @@ def create_app(
     pull_service = PaperPullService(
         database, resolved_local_root / "artifacts", fetch=paper_fetch
     )
+    document_service = PaperDocumentService(
+        database,
+        resolved_local_root / "artifacts",
+        fetch=paper_document_fetch,
+    )
     learning_service = LearningPlanService(database, store, client, config)
     direction_update_service = DirectionUpdateService(database, store, client, config)
+    paper_analysis_service = PaperAnalysisService(
+        database, store, document_service, client, config
+    )
     app = FastAPI(
         title="AI Paper Trends Dashboard",
         description="Local paper-ingestion, frontier-analysis, and learning workbench.",
@@ -75,6 +85,8 @@ def create_app(
     app.state.paper_pull_service = pull_service
     app.state.learning_plan_service = learning_service
     app.state.direction_update_service = direction_update_service
+    app.state.paper_document_service = document_service
+    app.state.paper_analysis_service = paper_analysis_service
     if initialize_immediately:
         initialize_local_state()
     else:

@@ -137,6 +137,57 @@ class LocalDatabase:
                     cached INTEGER NOT NULL,
                     created_at TEXT NOT NULL
                 );
+
+                CREATE TABLE IF NOT EXISTS paper_documents (
+                    id TEXT PRIMARY KEY,
+                    run_id TEXT NOT NULL,
+                    paper_id TEXT NOT NULL,
+                    source_url TEXT NOT NULL,
+                    pdf_url TEXT,
+                    local_pdf_path TEXT,
+                    status TEXT NOT NULL,
+                    content_hash TEXT NOT NULL,
+                    page_count INTEGER NOT NULL,
+                    chunks_json TEXT NOT NULL,
+                    error_json TEXT,
+                    created_at TEXT NOT NULL,
+                    updated_at TEXT NOT NULL,
+                    UNIQUE (run_id, paper_id, content_hash)
+                );
+
+                CREATE INDEX IF NOT EXISTS paper_documents_lookup_idx
+                    ON paper_documents(run_id, paper_id, updated_at);
+
+                CREATE TABLE IF NOT EXISTS paper_analyses (
+                    id TEXT PRIMARY KEY,
+                    job_id TEXT NOT NULL REFERENCES jobs(id),
+                    document_id TEXT NOT NULL REFERENCES paper_documents(id),
+                    run_id TEXT NOT NULL,
+                    paper_id TEXT NOT NULL,
+                    language TEXT NOT NULL,
+                    experience_level TEXT NOT NULL,
+                    reading_goal TEXT NOT NULL,
+                    math_depth TEXT NOT NULL,
+                    compute_profile TEXT NOT NULL,
+                    provider TEXT NOT NULL,
+                    model TEXT NOT NULL,
+                    prompt_version TEXT NOT NULL,
+                    artifact_json TEXT NOT NULL,
+                    created_at TEXT NOT NULL
+                );
+
+                CREATE INDEX IF NOT EXISTS paper_analyses_lookup_idx
+                    ON paper_analyses(run_id, paper_id, created_at);
+
+                CREATE TABLE IF NOT EXISTS paper_mastery_progress (
+                    analysis_id TEXT NOT NULL REFERENCES paper_analyses(id) ON DELETE CASCADE,
+                    check_id TEXT NOT NULL,
+                    status TEXT NOT NULL,
+                    answer TEXT NOT NULL DEFAULT '',
+                    feedback TEXT NOT NULL DEFAULT '',
+                    updated_at TEXT NOT NULL,
+                    PRIMARY KEY (analysis_id, check_id)
+                );
                 """
             )
 
@@ -521,6 +572,171 @@ class LocalDatabase:
                     int(bool(usage.get("cached", False))),
                     _utc_now(),
                 ),
+            )
+
+    def save_paper_document(self, payload: Dict[str, Any]) -> None:
+        now = _utc_now()
+        with self._connect() as connection:
+            connection.execute(
+                """
+                INSERT INTO paper_documents (
+                    id, run_id, paper_id, source_url, pdf_url, local_pdf_path,
+                    status, content_hash, page_count, chunks_json, error_json,
+                    created_at, updated_at
+                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                ON CONFLICT(id) DO UPDATE SET
+                    pdf_url = excluded.pdf_url,
+                    local_pdf_path = excluded.local_pdf_path,
+                    status = excluded.status,
+                    page_count = excluded.page_count,
+                    chunks_json = excluded.chunks_json,
+                    error_json = excluded.error_json,
+                    updated_at = excluded.updated_at
+                """,
+                (
+                    payload["id"],
+                    payload["run_id"],
+                    payload["paper_id"],
+                    payload["source_url"],
+                    payload.get("pdf_url"),
+                    payload.get("local_pdf_path"),
+                    payload["status"],
+                    payload["content_hash"],
+                    int(payload["page_count"]),
+                    json.dumps(payload["chunks"], ensure_ascii=False),
+                    json.dumps(payload.get("error"), ensure_ascii=False)
+                    if payload.get("error")
+                    else None,
+                    now,
+                    now,
+                ),
+            )
+
+    def get_paper_document(self, document_id: str) -> Dict[str, Any]:
+        with self._connect() as connection:
+            row = connection.execute(
+                "SELECT * FROM paper_documents WHERE id = ?", (document_id,)
+            ).fetchone()
+        if row is None:
+            raise KeyError(f"Unknown paper document: {document_id}")
+        item = dict(row)
+        item["chunks"] = json.loads(item.pop("chunks_json"))
+        item["error"] = (
+            json.loads(item.pop("error_json")) if item["error_json"] else None
+        )
+        return item
+
+    def get_latest_paper_document(
+        self, run_id: str, paper_id: str
+    ) -> Optional[Dict[str, Any]]:
+        with self._connect() as connection:
+            row = connection.execute(
+                """
+                SELECT id FROM paper_documents
+                WHERE run_id = ? AND paper_id = ?
+                ORDER BY updated_at DESC LIMIT 1
+                """,
+                (run_id, paper_id),
+            ).fetchone()
+        return self.get_paper_document(row["id"]) if row else None
+
+    def save_paper_analysis(
+        self,
+        *,
+        job_id: str,
+        document_id: str,
+        run_id: str,
+        paper_id: str,
+        language: str,
+        experience_level: str,
+        reading_goal: str,
+        math_depth: str,
+        compute_profile: str,
+        provider: str,
+        model: str,
+        prompt_version: str,
+        artifact: Dict[str, Any],
+    ) -> str:
+        analysis_id = f"paper_analysis_{uuid4().hex}"
+        with self._connect() as connection:
+            connection.execute(
+                """
+                INSERT INTO paper_analyses (
+                    id, job_id, document_id, run_id, paper_id, language,
+                    experience_level, reading_goal, math_depth, compute_profile,
+                    provider, model, prompt_version, artifact_json, created_at
+                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                """,
+                (
+                    analysis_id,
+                    job_id,
+                    document_id,
+                    run_id,
+                    paper_id,
+                    language,
+                    experience_level,
+                    reading_goal,
+                    math_depth,
+                    compute_profile,
+                    provider,
+                    model,
+                    prompt_version,
+                    json.dumps(artifact, ensure_ascii=False),
+                    _utc_now(),
+                ),
+            )
+        return analysis_id
+
+    def get_paper_analysis(self, analysis_id: str) -> Dict[str, Any]:
+        with self._connect() as connection:
+            row = connection.execute(
+                "SELECT * FROM paper_analyses WHERE id = ?", (analysis_id,)
+            ).fetchone()
+            progress = connection.execute(
+                "SELECT * FROM paper_mastery_progress WHERE analysis_id = ?",
+                (analysis_id,),
+            ).fetchall()
+        if row is None:
+            raise KeyError(f"Unknown paper analysis: {analysis_id}")
+        item = dict(row)
+        item["artifact"] = json.loads(item.pop("artifact_json"))
+        item["progress"] = [dict(value) for value in progress]
+        return item
+
+    def list_paper_analyses(self, run_id: str, paper_id: str) -> List[Dict[str, Any]]:
+        with self._connect() as connection:
+            rows = connection.execute(
+                """
+                SELECT id FROM paper_analyses
+                WHERE run_id = ? AND paper_id = ?
+                ORDER BY created_at DESC
+                """,
+                (run_id, paper_id),
+            ).fetchall()
+        return [self.get_paper_analysis(row["id"]) for row in rows]
+
+    def save_paper_mastery_progress(
+        self,
+        analysis_id: str,
+        check_id: str,
+        *,
+        status: str,
+        answer: str,
+        feedback: str,
+    ) -> None:
+        with self._connect() as connection:
+            connection.execute(
+                """
+                INSERT INTO paper_mastery_progress (
+                    analysis_id, check_id, status, answer, feedback, updated_at
+                ) VALUES (?, ?, ?, ?, ?, ?)
+                ON CONFLICT(analysis_id, check_id) DO UPDATE SET
+                    status = excluded.status,
+                    answer = excluded.answer,
+                    feedback = excluded.feedback,
+                    updated_at = excluded.updated_at
+                """,
+                (analysis_id, check_id, status, answer, feedback, _utc_now()),
             )
 
     def save_direction_update(

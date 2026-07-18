@@ -4,10 +4,10 @@ from __future__ import annotations
 
 import hashlib
 import json
-from threading import Event, Thread
 from typing import Any, Dict
 
 from src.cloud_ai.client import CloudAIClient, CloudAIConfig
+from src.cloud_ai.job_runtime import run_with_heartbeat
 from src.cloud_ai.schemas import DirectionUpdateArtifact
 from src.storage import LocalDatabase
 from web.result_store import ResultStore
@@ -57,18 +57,12 @@ class DirectionUpdateService:
             self.database.update_job(
                 job_id, stage="analysing_directions", progress_current=1, progress_total=4
             )
-            stop_heartbeat = Event()
-            heartbeat = Thread(
-                target=self._heartbeat_while_generating,
-                args=(job_id, stop_heartbeat),
-                daemon=True,
+            raw_artifact, usage = run_with_heartbeat(
+                self.database,
+                job_id,
+                "analysing_directions",
+                lambda: self.client.analyze_direction_updates(context),
             )
-            heartbeat.start()
-            try:
-                raw_artifact, usage = self.client.analyze_direction_updates(context)
-            finally:
-                stop_heartbeat.set()
-                heartbeat.join(timeout=1)
             self.database.update_job(
                 job_id, stage="validating_direction_evidence", progress_current=2
             )
@@ -187,16 +181,3 @@ class DirectionUpdateService:
         }
         if unassigned - evidence_ids:
             raise ValueError("Every unassigned paper must support a direction candidate")
-
-    def _heartbeat_while_generating(self, job_id: str, stop: Event) -> None:
-        while not stop.wait(10):
-            try:
-                self.database.update_job(
-                    job_id,
-                    status="running",
-                    stage="analysing_directions",
-                    progress_current=1,
-                    progress_total=4,
-                )
-            except KeyError:
-                return

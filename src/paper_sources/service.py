@@ -45,7 +45,7 @@ class PaperPullService:
     ) -> None:
         self.database = database
         self.artifact_root = artifact_root
-        self._fetch = fetch or self._fetch_public_url
+        self._fetch = fetch or fetch_public_document
 
     def create_job(self, payload: Dict[str, Any]) -> Dict[str, str]:
         """Persist a reusable source and queue its first pull job."""
@@ -146,26 +146,6 @@ class PaperPullService:
                 counts["failed"] += 1
         return counts
 
-    @staticmethod
-    def _fetch_public_url(url: str) -> FetchedDocument:
-        validate_public_url(url)
-        with httpx.Client(
-            timeout=httpx.Timeout(30.0),
-            follow_redirects=True,
-            headers={"User-Agent": "AI-Paper-Trends/2.0 (+local research tool)"},
-        ) as client:
-            response = client.get(url)
-            response.raise_for_status()
-            validate_public_url(str(response.url))
-            if len(response.content) > 50 * 1024 * 1024:
-                raise PaperPullError("Source response exceeds the 50 MB safety limit")
-            return FetchedDocument(
-                url=str(response.url),
-                content=response.content,
-                content_type=response.headers.get("content-type", "application/octet-stream"),
-            )
-
-
 def validate_public_url(url: str) -> None:
     """Reject local-network targets to keep the user-entered fetch endpoint safe."""
     parsed = urlparse(url)
@@ -181,6 +161,28 @@ def validate_public_url(url: str) -> None:
         ip = ipaddress.ip_address(address)
         if not ip.is_global:
             raise PaperPullError("Paper sources must resolve to a public internet address")
+
+
+def fetch_public_document(url: str) -> FetchedDocument:
+    """Fetch one bounded public document after rejecting private-network targets."""
+    validate_public_url(url)
+    with httpx.Client(
+        timeout=httpx.Timeout(30.0),
+        follow_redirects=True,
+        headers={"User-Agent": "AI-Paper-Trends/2.0 (+local research tool)"},
+    ) as client:
+        response = client.get(url)
+        response.raise_for_status()
+        validate_public_url(str(response.url))
+        if len(response.content) > 50 * 1024 * 1024:
+            raise PaperPullError("Source response exceeds the 50 MB safety limit")
+        return FetchedDocument(
+            url=str(response.url),
+            content=response.content,
+            content_type=response.headers.get(
+                "content-type", "application/octet-stream"
+            ),
+        )
 
 
 def parse_document(document: FetchedDocument, parser_type: str = "auto") -> List[Dict[str, Any]]:

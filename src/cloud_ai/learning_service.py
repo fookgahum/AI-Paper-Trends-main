@@ -5,7 +5,6 @@ from __future__ import annotations
 import hashlib
 import json
 from datetime import datetime, timezone
-from threading import Event, Thread
 from typing import Any, Dict
 
 from src.cloud_ai.client import (
@@ -13,6 +12,7 @@ from src.cloud_ai.client import (
     CloudAIConfig,
     verified_resource_catalog,
 )
+from src.cloud_ai.job_runtime import run_with_heartbeat
 from src.cloud_ai.schemas import LearningPlanArtifact
 from src.storage import LocalDatabase
 from web.result_store import ResultStore, ResultStoreError
@@ -45,18 +45,12 @@ class LearningPlanService:
             self.database.update_job(
                 job_id, stage="generating", progress_current=1, progress_total=4
             )
-            stop_heartbeat = Event()
-            heartbeat = Thread(
-                target=self._heartbeat_while_generating,
-                args=(job_id, stop_heartbeat),
-                daemon=True,
+            raw_artifact, usage = run_with_heartbeat(
+                self.database,
+                job_id,
+                "generating",
+                lambda: self.client.generate_learning_plan(context),
             )
-            heartbeat.start()
-            try:
-                raw_artifact, usage = self.client.generate_learning_plan(context)
-            finally:
-                stop_heartbeat.set()
-                heartbeat.join(timeout=1)
             self.database.update_job(
                 job_id, stage="validating", progress_current=2, progress_total=4
             )
@@ -170,16 +164,3 @@ class LearningPlanService:
         }
         if generated_resource_urls - allowed_resource_urls:
             raise ValueError("AI output invented an unverified starter-resource URL")
-
-    def _heartbeat_while_generating(self, job_id: str, stop: Event) -> None:
-        while not stop.wait(10):
-            try:
-                self.database.update_job(
-                    job_id,
-                    status="running",
-                    stage="generating",
-                    progress_current=1,
-                    progress_total=4,
-                )
-            except KeyError:
-                return

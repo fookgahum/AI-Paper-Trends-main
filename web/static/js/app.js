@@ -1,20 +1,21 @@
 "use strict";
 
 const LEARNING_ARTIFACT_VERSION = 3;
+const PAPER_ANALYSIS_ARTIFACT_VERSION = 1;
 
 const translations = {
   "zh-CN": {
     brandSubtitle: "前沿选题雷达", navOpportunities: "研究机会", navTopics: "聚类证据",
-    navPapers: "论文浏览", navUpdates: "论文增量", navLearning: "学习与复现", navData: "方法与数据", navAbout: "关于", localReadOnly: "本地研究工作台",
+    navPapers: "论文浏览", navUpdates: "论文增量", navLearning: "学习与复现", navPaperAnalysis: "单篇精读", navData: "方法与数据", navAbout: "关于", localReadOnly: "本地研究工作台",
     dashboardEyebrow: "FRONTIER OPPORTUNITY RADAR", opportunitiesTitle: "哪些方向更适合写论文？",
-    topicsTitle: "聚类证据", papersTitle: "论文证据", updatesTitle: "论文增量", learningTitle: "学习与复现", dataTitle: "方法与数据", aboutPageTitle: "关于平台",
+    topicsTitle: "聚类证据", papersTitle: "论文证据", updatesTitle: "论文增量", learningTitle: "学习与复现", paperAnalysisTitle: "单篇论文 AI 精读", dataTitle: "方法与数据", aboutPageTitle: "关于平台",
     updatesEyebrow: "PAPER INGESTION", updatesHeading: "从公开网址拉取论文增量", updatesIntro: "输入论文集页面或 JSON 地址；系统解析、标准化并去重。拉取不会自动调用付费 AI。",
     newPaperSource: "新增论文来源", sourceUrl: "公开网址", sourceConference: "会议", sourceYear: "年份", sourceParser: "页面类型", parserAuto: "自动识别",
     downloadPdfs: "同时下载公开 PDF（较慢）", startPull: "开始拉取", pullSafety: "仅允许公网 HTTP/HTTPS 地址；本地和内网地址会被拒绝。", jobProgress: "任务进度", pullResult: "本次拉取结果", noPullYet: "尚未开始拉取。", savedSources: "已保存来源", localPapers: "本地论文", pullAgain: "再次拉取", noSavedSources: "还没有保存的来源。",
     directionUpdateHeading: "分析未归类论文与新方向候选", directionUpdateIntro: "这是独立的 AI 任务；只有点击后才运行。结果保存为草稿，不会自动修改正式 13 个方向。", analysisLimit: "本次最多分析", analyseNewPapers: "用 AI 分析新论文", noDirectionUpdate: "尚未运行方向更新。", mappedExisting: "映射到现有方向", candidatePapers: "候选论文", noPendingPapers: "没有等待分析的新论文", draftCandidate: "候选方向草稿",
     learningEyebrow: "LEARN → REPRODUCE → RESEARCH", learningHeading: "把前沿方向变成可执行的学习与复现路径", learningIntro: "先圈定必须掌握的知识、前置缺口和学习边界，再把知识地图投影成 7/30/90 天安排。",
     planSettings: "学习路线设置", chooseDirection: "前沿方向", duration: "时间投影", weeklyHours: "每周小时", experience: "当前基础", zeroFoundation: "零基础", beginner: "入门", intermediate: "中等", advanced: "进阶", computeProfile: "算力条件", cpuOnly: "纯 CPU", singleGpu: "单卡或 CPU", multiGpu: "多卡", cloudFlexible: "弹性云资源", generatePlan: "生成知识路线", mockHint: "学习周期只影响节奏，不改变必须掌握的知识边界。默认 mock 模式不产生费用。", noPlanYet: "选择一个方向后生成知识路线。",
-    knowledgeCurriculum: "知识课程边界", startingPoint: "起点假设", targetCapability: "最终能力", estimatedHours: "研究就绪约需", minimumHours: "读懂论文约需", availableHours: "所选周期可用", requiredNodes: "必备知识节点", optionalNodes: "可选补充", minimumPath: "先达到：结构化读论文", minimumPathHint: "这不是研究就绪；它只让你有能力开始读锚点论文。", startNow: "现在只做第一关", startNowHint: "先不要展开完整知识图，也不要急着读前沿论文。学完指定小节，亲手完成过关证据。", startResources: "第一关资料", startEvidence: "离开资料前必须做到", deferTopics: "暂时不用学", exitCriteria: "学成标准", gapDiagnosis: "前置缺口诊断（需要时展开）", currentAssumption: "当前假设", targetLevel: "需要补到", diagnosticQuestions: "先自测", masteryMilestones: "按能力关卡推进", milestoneHint: "不要按天数硬赶。只有能独立通过验收，才进入下一关。", gateChecks: "过关证据", commonFailures: "常见假掌握", linkedKnowledge: "本关知识", starterResources: "从这些可靠资料开始", resourceHint: "只学指定章节，达到停止条件就离开资料，转入练习和论文。", recommendedSections: "只学这些章节", stopRule: "停止条件", knowledgeTree: "完整分层知识地图", whyRequired: "为什么必须学", learnThese: "具体学什么", skipForNow: "边界：暂时不用学", masteryChecks: "掌握检查", resourceSearch: "方向资料检索词", prerequisites: "前置节点", planStages: "按时间安排（次要）", calendarProjection: "把知识地图投影成阶段计划", calendarHint: "先确认知识范围；只有需要执行节奏时再展开。", anchorPapers: "锚点论文（第三关使用）", reproductionLadder: "复现阶梯", researchHypotheses: "最小研究假设", researchExit: "复现与研究出口", researchExitHint: "通过论文阅读关卡后再展开，避免现在分散注意力。", deliverable: "交付物", acceptance: "验收标准", markDone: "标记完成", completed: "已完成", required: "必须掌握", paperLiteracy: "论文可读路径", optional: "可选", cloudReady: "云端已配置", mockMode: "Mock 免费测试", cloudMissing: "云端缺少 API Key", staleBackend: "后端版本过旧，请停止并重新启动网站", learningContractMismatch: "学习计划来自旧版后端，缺少新版知识路线字段。请在运行网站的终端按 Ctrl+C，然后重新执行启动命令。", jobFailed: "任务失败", jobRunning: "任务执行中", parsedPapers: "解析", newPapers: "新增", duplicatePapers: "重复", rejectedPapers: "拒绝",
+    knowledgeCurriculum: "知识课程边界", startingPoint: "起点假设", targetCapability: "最终能力", estimatedHours: "研究就绪约需", minimumHours: "读懂论文约需", availableHours: "所选周期可用", requiredNodes: "必备知识节点", minimumPath: "先达到：结构化读论文", minimumPathHint: "这不是研究就绪；它只让你有能力开始读锚点论文。", startNow: "现在只做第一关", startNowHint: "先不要展开完整知识图，也不要急着读前沿论文。学完指定小节，亲手完成过关证据。", startResources: "第一关资料", startEvidence: "离开资料前必须做到", deferTopics: "暂时不用学", exitCriteria: "学成标准", gapDiagnosis: "前置缺口诊断（需要时展开）", currentAssumption: "当前假设", targetLevel: "需要补到", diagnosticQuestions: "先自测", masteryMilestones: "按能力关卡推进", milestoneHint: "不要按天数硬赶。只有能独立通过验收，才进入下一关。", gateChecks: "过关证据", commonFailures: "常见假掌握", linkedKnowledge: "本关知识", starterResources: "从这些可靠资料开始", resourceHint: "只学指定章节，达到停止条件就离开资料，转入练习和论文。", recommendedSections: "只学这些章节", stopRule: "停止条件", knowledgeTree: "完整分层知识地图", whyRequired: "为什么必须学", learnThese: "具体学什么", skipForNow: "边界：暂时不用学", masteryChecks: "掌握检查", resourceSearch: "方向资料检索词", prerequisites: "前置节点", calendarProjection: "把知识地图投影成阶段计划", calendarHint: "先确认知识范围；只有需要执行节奏时再展开。", anchorPapers: "锚点论文（第三关使用）", reproductionLadder: "复现阶梯", researchHypotheses: "最小研究假设", researchExit: "复现与研究出口", researchExitHint: "通过论文阅读关卡后再展开，避免现在分散注意力。", deliverable: "交付物", acceptance: "验收标准", markDone: "标记完成", completed: "已完成", required: "必须掌握", paperLiteracy: "论文可读路径", optional: "可选", cloudReady: "云端已配置", mockMode: "Mock 免费测试", cloudMissing: "云端缺少 API Key", staleBackend: "后端版本过旧，请停止并重新启动网站", learningContractMismatch: "学习计划来自旧版后端，缺少新版知识路线字段。请在运行网站的终端按 Ctrl+C，然后重新执行启动命令。", jobFailed: "任务失败", jobRunning: "任务执行中", parsedPapers: "解析", newPapers: "新增", duplicatePapers: "重复", rejectedPapers: "拒绝",
     dataset: "数据集", conference: "会议", allConferences: "全部会议", loading: "正在生成方向建议…",
     decisionCaveatTitle: "先说明“容易写”的含义", decisionCaveat: "切入友好度衡量资源匹配、可做题型和证据广度，不是录用率，也不保证论文发表。",
     heuristicBadge: "决策辅助 · 非录用预测", heroEyebrow: "ANSWER FIRST", heroTitle: "不要再看关键词串，直接看哪里值得切入",
@@ -44,6 +45,8 @@ const translations = {
     search: "搜索", searchPlaceholder: "搜索标题、作者、关键词或摘要", allTopics: "全部底层主题", decision: "类型", allDecisions: "全部类型",
     sort: "排序", sortTitle: "按标题", sortConference: "按会议", sortTopic: "按底层主题", applyFilters: "应用筛选",
     previous: "上一页", next: "下一页", pageStatus: "第 {page} / {pages} 页", paperResults: "{count} 篇论文", details: "查看详情",
+    paperAnalysisEyebrow: "READ → VERIFY → REPRODUCE", paperAnalysisHeading: "把一篇论文变成可解释、可核查、可复现的知识", paperAnalysisIntro: "先用三分钟抓住主线，再沿页码证据拆方法、审实验、补知识，最后形成最小复现路线。", noPaperSelected: "尚未选择论文", analysisSettings: "精读设置", choosePaperFirst: "请先从论文浏览中选择一篇论文", readingGoal: "阅读目标", goalQuick: "快速理解", goalDeep: "深度掌握", goalReproduce: "准备复现", mathDepth: "数学解释深度", mathIntuition: "直觉优先", mathFormula: "公式结合", mathDerivation: "完整推导", preferFullText: "优先获取并解析公开 PDF", startPaperAnalysis: "开始 AI 精读", paperAnalysisMockHint: "当前使用免费 Mock 分析；全文失败时会明确降级为摘要级分析。", paperAnalysisEmpty: "从“论文浏览”打开论文详情，然后点击“AI 精读这篇论文”。", analyseThisPaper: "AI 精读这篇论文", fullTextScope: "全文分析", abstractScope: "摘要级分析", scopeWarning: "证据边界", threeMinuteBrief: "三分钟速览", readingRoute: "推荐阅读顺序", paperLogic: "论文逻辑链", methodBreakdown: "方法数据流", experimentAudit: "实验证据审查", prerequisitesForPaper: "只补这篇论文需要的知识", reproductionBlueprint: "最小复现路线", masteryTest: "主动回忆检查", researchExtensions: "从复现走向研究", evidenceLedger: "证据账本", openEvidence: "打开证据", openCachedPdf: "打开本地 PDF", pageLabel: "第 {page} 页", abstractLabel: "摘要", evidenceAuthor: "作者陈述", evidenceSynthesis: "AI 归纳", evidenceVerify: "待核查", purpose: "目的", inputLabel: "输入", processLabel: "处理", outputLabel: "输出", whyMatters: "为什么重要", strengthSupported: "支持", strengthPartial: "部分支持", strengthNotShown: "尚未证明", caution: "注意", knowledgeMust: "阅读前必须", knowledgeJit: "遇到再补", knowledgeDefer: "暂时不学", learnBoundary: "学习内容", selfCheck: "自测", expectedOutput: "预期输出", successCriteria: "成功标准", estimatedEffort: "预计 {hours} 小时", submitAnswer: "提交回答", yourAnswer: "用自己的话回答，不能复制上面的总结", expectedPoints: "应包含的要点", analysisPassed: "已通过", analysisNeedsReview: "需要补充", selectFromPapers: "去论文浏览选择", analysisHistory: "已有精读记录", noAnalysisHistory: "还没有精读记录", analysisReady: "精读结果已生成", documentPages: "已解析 {count} 页", analysisFailed: "精读失败",
+    minimumExperiment: "最小实验",
     methodologyEyebrow: "METHOD & PROVENANCE", methodologyTitle: "评分方法与数据边界", methodologySubtitle: "让建议可解释、可复核，也明确它不能回答什么。",
     scoreMethodTitle: "切入友好度如何计算", formulaResource: "资源匹配", formulaBreadth: "跨会议覆盖", formulaEvaluation: "评测型切入信号",
     formulaEvidence: "样本证据量", formulaCompetition: "样本拥挤余量", limitationsTitle: "这份建议不能证明什么", generatedAt: "生成时间", sampleSeed: "随机种子", sampleSize: "每会议样本",
@@ -56,16 +59,16 @@ const translations = {
   },
   "en-US": {
     brandSubtitle: "Frontier opportunity radar", navOpportunities: "Research opportunities", navTopics: "Cluster evidence",
-    navPapers: "Papers", navUpdates: "Paper updates", navLearning: "Learn & reproduce", navData: "Method & data", navAbout: "About", localReadOnly: "Local research workbench",
+    navPapers: "Papers", navUpdates: "Paper updates", navLearning: "Learn & reproduce", navPaperAnalysis: "Paper close reading", navData: "Method & data", navAbout: "About", localReadOnly: "Local research workbench",
     dashboardEyebrow: "FRONTIER OPPORTUNITY RADAR", opportunitiesTitle: "Which directions are more practical to publish in?",
-    topicsTitle: "Cluster evidence", papersTitle: "Paper evidence", updatesTitle: "Paper updates", learningTitle: "Learn & reproduce", dataTitle: "Method & data", aboutPageTitle: "About",
+    topicsTitle: "Cluster evidence", papersTitle: "Paper evidence", updatesTitle: "Paper updates", learningTitle: "Learn & reproduce", paperAnalysisTitle: "Single-paper AI close reading", dataTitle: "Method & data", aboutPageTitle: "About",
     updatesEyebrow: "PAPER INGESTION", updatesHeading: "Pull paper updates from a public URL", updatesIntro: "Enter a proceedings page or JSON feed. The system parses, normalizes, and deduplicates without invoking paid AI.",
     newPaperSource: "Add paper source", sourceUrl: "Public URL", sourceConference: "Conference", sourceYear: "Year", sourceParser: "Page type", parserAuto: "Auto-detect",
     downloadPdfs: "Also download public PDFs (slower)", startPull: "Start pull", pullSafety: "Only public HTTP/HTTPS URLs are accepted; local and private-network targets are rejected.", jobProgress: "Job progress", pullResult: "Pull result", noPullYet: "No pull has started.", savedSources: "Saved sources", localPapers: "local papers", pullAgain: "Pull again", noSavedSources: "No saved sources yet.",
     directionUpdateHeading: "Analyse unclassified papers and new direction candidates", directionUpdateIntro: "This is a separate AI task and runs only when clicked. Results stay as drafts and never alter the 13 published directions automatically.", analysisLimit: "Maximum papers", analyseNewPapers: "Analyse new papers with AI", noDirectionUpdate: "No direction update has run.", mappedExisting: "Mapped to existing directions", candidatePapers: "Candidate papers", noPendingPapers: "No new papers are waiting for analysis", draftCandidate: "Direction candidate draft",
     learningEyebrow: "LEARN → REPRODUCE → RESEARCH", learningHeading: "Turn a frontier direction into a learning and reproduction path", learningIntro: "First bound required knowledge, prerequisite gaps, and what to defer; only then project the map onto 7/30/90 days.",
     planSettings: "Curriculum settings", chooseDirection: "Frontier direction", duration: "Time projection", weeklyHours: "Hours per week", experience: "Experience", zeroFoundation: "Zero foundation", beginner: "Beginner", intermediate: "Intermediate", advanced: "Advanced", computeProfile: "Compute profile", cpuOnly: "CPU only", singleGpu: "Single GPU or CPU", multiGpu: "Multiple GPUs", cloudFlexible: "Flexible cloud", generatePlan: "Generate knowledge path", mockHint: "Duration changes pacing, not the required knowledge boundary. Mock mode is free by default.", noPlanYet: "Choose a direction and generate a knowledge path.",
-    knowledgeCurriculum: "Curriculum boundary", startingPoint: "Starting assumption", targetCapability: "Target capability", estimatedHours: "Research-ready effort", minimumHours: "Paper-literacy effort", availableHours: "Available in selected period", requiredNodes: "Required knowledge nodes", optionalNodes: "Optional additions", minimumPath: "First target: structured paper literacy", minimumPathHint: "This is not research-ready; it only makes you capable of starting the anchor papers.", startNow: "Do only Gate 1 now", startNowHint: "Do not expand the full map or rush into frontier papers yet. Use the prescribed sections, then produce the passing evidence yourself.", startResources: "Gate 1 resources", startEvidence: "Before leaving the resources, you must", deferTopics: "Defer for now", exitCriteria: "Exit criteria", gapDiagnosis: "Prerequisite gap diagnosis (expand if needed)", currentAssumption: "Current assumption", targetLevel: "Target level", diagnosticQuestions: "Self-check first", masteryMilestones: "Advance through capability gates", milestoneHint: "Do not race the calendar. Move on only after passing the checks independently.", gateChecks: "Passing evidence", commonFailures: "False-mastery traps", linkedKnowledge: "Knowledge in this gate", starterResources: "Start with these reviewed resources", resourceHint: "Use only the prescribed sections. Leave the resource as soon as the stop rule passes, then practise and read papers.", recommendedSections: "Use only these sections", stopRule: "Stop rule", knowledgeTree: "Complete layered knowledge map", whyRequired: "Why it is required", learnThese: "What to learn", skipForNow: "Boundary: defer for now", masteryChecks: "Mastery checks", resourceSearch: "Direction-resource search terms", prerequisites: "Prerequisite nodes", planStages: "Calendar projection (secondary)", calendarProjection: "Project the knowledge map onto stages", calendarHint: "Confirm the knowledge boundary first; expand this only when you need execution pacing.", anchorPapers: "Anchor papers (use at Gate 3)", reproductionLadder: "Reproduction ladder", researchHypotheses: "Minimum research hypotheses", researchExit: "Reproduction and research exit", researchExitHint: "Expand only after passing the paper-reading gate so it does not split your attention now.", deliverable: "Deliverable", acceptance: "Acceptance", markDone: "Mark done", completed: "Completed", required: "Required", paperLiteracy: "Paper-literacy path", optional: "Optional", cloudReady: "Cloud configured", mockMode: "Free mock test", cloudMissing: "Cloud API key missing", staleBackend: "Backend is outdated; stop and restart the site", learningContractMismatch: "This plan came from an outdated backend and lacks the current curriculum fields. Press Ctrl+C in the terminal running the site, then run the start command again.", jobFailed: "Job failed", jobRunning: "Job running", parsedPapers: "Parsed", newPapers: "New", duplicatePapers: "Duplicates", rejectedPapers: "Rejected",
+    knowledgeCurriculum: "Curriculum boundary", startingPoint: "Starting assumption", targetCapability: "Target capability", estimatedHours: "Research-ready effort", minimumHours: "Paper-literacy effort", availableHours: "Available in selected period", requiredNodes: "Required knowledge nodes", minimumPath: "First target: structured paper literacy", minimumPathHint: "This is not research-ready; it only makes you capable of starting the anchor papers.", startNow: "Do only Gate 1 now", startNowHint: "Do not expand the full map or rush into frontier papers yet. Use the prescribed sections, then produce the passing evidence yourself.", startResources: "Gate 1 resources", startEvidence: "Before leaving the resources, you must", deferTopics: "Defer for now", exitCriteria: "Exit criteria", gapDiagnosis: "Prerequisite gap diagnosis (expand if needed)", currentAssumption: "Current assumption", targetLevel: "Target level", diagnosticQuestions: "Self-check first", masteryMilestones: "Advance through capability gates", milestoneHint: "Do not race the calendar. Move on only after passing the checks independently.", gateChecks: "Passing evidence", commonFailures: "False-mastery traps", linkedKnowledge: "Knowledge in this gate", starterResources: "Start with these reviewed resources", resourceHint: "Use only the prescribed sections. Leave the resource as soon as the stop rule passes, then practise and read papers.", recommendedSections: "Use only these sections", stopRule: "Stop rule", knowledgeTree: "Complete layered knowledge map", whyRequired: "Why it is required", learnThese: "What to learn", skipForNow: "Boundary: defer for now", masteryChecks: "Mastery checks", resourceSearch: "Direction-resource search terms", prerequisites: "Prerequisite nodes", calendarProjection: "Project the knowledge map onto stages", calendarHint: "Confirm the knowledge boundary first; expand this only when you need execution pacing.", anchorPapers: "Anchor papers (use at Gate 3)", reproductionLadder: "Reproduction ladder", researchHypotheses: "Minimum research hypotheses", researchExit: "Reproduction and research exit", researchExitHint: "Expand only after passing the paper-reading gate so it does not split your attention now.", deliverable: "Deliverable", acceptance: "Acceptance", markDone: "Mark done", completed: "Completed", required: "Required", paperLiteracy: "Paper-literacy path", optional: "Optional", cloudReady: "Cloud configured", mockMode: "Free mock test", cloudMissing: "Cloud API key missing", staleBackend: "Backend is outdated; stop and restart the site", learningContractMismatch: "This plan came from an outdated backend and lacks the current curriculum fields. Press Ctrl+C in the terminal running the site, then run the start command again.", jobFailed: "Job failed", jobRunning: "Job running", parsedPapers: "Parsed", newPapers: "New", duplicatePapers: "Duplicates", rejectedPapers: "Rejected",
     dataset: "Dataset", conference: "Conference", allConferences: "All conferences", loading: "Building direction recommendations…",
     decisionCaveatTitle: "What “easier to enter” means", decisionCaveat: "Entry friendliness measures resource fit, viable paper shapes, and evidence breadth. It is not an acceptance rate or publication guarantee.",
     heuristicBadge: "Decision aid · not acceptance prediction", heroEyebrow: "ANSWER FIRST", heroTitle: "Move beyond keyword strings and see where to enter",
@@ -95,6 +98,8 @@ const translations = {
     search: "Search", searchPlaceholder: "Search title, author, keyword, or abstract", allTopics: "All base topics", decision: "Type", allDecisions: "All types",
     sort: "Sort", sortTitle: "By title", sortConference: "By conference", sortTopic: "By base topic", applyFilters: "Apply filters",
     previous: "Previous", next: "Next", pageStatus: "Page {page} of {pages}", paperResults: "{count} papers", details: "View details",
+    paperAnalysisEyebrow: "READ → VERIFY → REPRODUCE", paperAnalysisHeading: "Turn one paper into explainable, verifiable, reproducible knowledge", paperAnalysisIntro: "Capture the main line in three minutes, then follow page-grounded evidence through method, experiments, prerequisites, and minimum reproduction.", noPaperSelected: "No paper selected", analysisSettings: "Analysis settings", choosePaperFirst: "Choose a paper from the paper explorer first", readingGoal: "Reading goal", goalQuick: "Quick understanding", goalDeep: "Deep mastery", goalReproduce: "Prepare to reproduce", mathDepth: "Mathematical depth", mathIntuition: "Intuition first", mathFormula: "Formula with intuition", mathDerivation: "Full derivation", preferFullText: "Fetch and parse the public PDF first", startPaperAnalysis: "Start AI close reading", paperAnalysisMockHint: "The current free Mock analysis explicitly falls back to abstract-only scope when full text fails.", paperAnalysisEmpty: "Open a paper in the explorer, then choose “AI close-read this paper”.", analyseThisPaper: "AI close-read this paper", fullTextScope: "Full-text analysis", abstractScope: "Abstract-only analysis", scopeWarning: "Evidence boundary", threeMinuteBrief: "Three-minute brief", readingRoute: "Recommended reading route", paperLogic: "Paper logic chain", methodBreakdown: "Method data flow", experimentAudit: "Experimental evidence audit", prerequisitesForPaper: "Learn only what this paper requires", reproductionBlueprint: "Minimum reproduction route", masteryTest: "Active-recall checks", researchExtensions: "From reproduction to research", evidenceLedger: "Evidence ledger", openEvidence: "Open evidence", openCachedPdf: "Open local PDF", pageLabel: "Page {page}", abstractLabel: "Abstract", evidenceAuthor: "Author statement", evidenceSynthesis: "AI synthesis", evidenceVerify: "Needs verification", purpose: "Purpose", inputLabel: "Input", processLabel: "Process", outputLabel: "Output", whyMatters: "Why it matters", strengthSupported: "Supported", strengthPartial: "Partial", strengthNotShown: "Not shown", caution: "Caution", knowledgeMust: "Must know first", knowledgeJit: "Learn just in time", knowledgeDefer: "Defer", learnBoundary: "Learning boundary", selfCheck: "Self-check", expectedOutput: "Expected output", successCriteria: "Success criteria", estimatedEffort: "About {hours} hours", submitAnswer: "Submit answer", yourAnswer: "Answer in your own words; do not copy the summary above", expectedPoints: "Expected points", analysisPassed: "Passed", analysisNeedsReview: "Needs revision", selectFromPapers: "Choose from papers", analysisHistory: "Existing close readings", noAnalysisHistory: "No close reading yet", analysisReady: "Close reading is ready", documentPages: "Parsed {count} pages", analysisFailed: "Close reading failed",
+    minimumExperiment: "Minimum experiment",
     methodologyEyebrow: "METHOD & PROVENANCE", methodologyTitle: "Scoring method and data boundaries", methodologySubtitle: "Make recommendations explainable and explicit about what they cannot establish.",
     scoreMethodTitle: "How entry friendliness is calculated", formulaResource: "Resource fit", formulaBreadth: "Cross-venue breadth", formulaEvaluation: "Evaluation-entry signal",
     formulaEvidence: "Evidence volume", formulaCompetition: "Sample-density headroom", limitationsTitle: "What these recommendations cannot establish", generatedAt: "Generated at", sampleSeed: "Random seed", sampleSize: "Sample per venue",
@@ -117,7 +122,10 @@ const state = {
   pageSize: 20,
   charts: {},
   activeLearningPlan: null,
+  activePaper: null,
+  activePaperAnalysis: null,
   learningBackendCompatible: true,
+  paperAnalysisBackendCompatible: true,
 };
 
 const $ = (selector) => document.querySelector(selector);
@@ -180,7 +188,7 @@ function applyTranslations() {
 function updatePageTitle(section) {
   const key = {
     opportunities: "opportunitiesTitle", topics: "topicsTitle", papers: "papersTitle",
-    updates: "updatesTitle", learning: "learningTitle", data: "dataTitle", about: "aboutPageTitle",
+    updates: "updatesTitle", learning: "learningTitle", "paper-analysis": "paperAnalysisTitle", data: "dataTitle", about: "aboutPageTitle",
   }[section];
   $("#page-title").textContent = t(key);
 }
@@ -530,10 +538,174 @@ async function openPaper(paperId) {
       <div class="detail-section"><h3>${escapeHtml(t("authors"))}</h3><p>${escapeHtml(paper.authors.join(", "))}</p></div>
       <div class="detail-section"><h3>${escapeHtml(t("abstract"))}</h3><p>${escapeHtml(paper.abstract || t("noAbstract"))}</p></div>
       <div class="detail-section"><h3>${escapeHtml(t("keywords"))}</h3><p>${escapeHtml(keywords)}</p></div>
-      <div class="detail-section"><a class="primary-button" href="${escapeHtml(safeUrl(paper.source_url))}" target="_blank" rel="noopener noreferrer">${escapeHtml(t("originalSource"))}</a></div>`;
+      <div class="detail-section paper-detail-actions"><a class="secondary-button" href="${escapeHtml(safeUrl(paper.source_url))}" target="_blank" rel="noopener noreferrer">${escapeHtml(t("originalSource"))}</a><button id="analyse-paper-button" class="primary-button" type="button">${escapeHtml(t("analyseThisPaper"))}</button></div>`;
+    $("#analyse-paper-button").addEventListener("click", () => preparePaperAnalysis(paper));
     $("#paper-dialog").showModal();
   } catch (error) {
     showError(error);
+  }
+}
+
+function paperEvidenceButtons(ids, evidenceById) {
+  return `<span class="paper-citations">${(ids || []).map((id) => {
+    const item = evidenceById[id];
+    if (!item) return "";
+    const label = item.page > 0 ? t("pageLabel", { page: item.page }) : t("abstractLabel");
+    return `<button type="button" class="evidence-jump" data-evidence-id="${escapeHtml(id)}">${escapeHtml(label)}</button>`;
+  }).join("")}</span>`;
+}
+
+async function preparePaperAnalysis(paper) {
+  state.activePaper = paper;
+  state.activePaperAnalysis = null;
+  $("#paper-dialog").close();
+  $("#analysis-paper-title").textContent = paper.title;
+  $("#paper-analysis-scope").textContent = `${paper.conference} ${paper.year}`;
+  $("#paper-analysis-submit").disabled = !state.paperAnalysisBackendCompatible;
+  $("#paper-analysis-output").innerHTML = "";
+  showSection("paper-analysis");
+  await loadPaperAnalysisHistory();
+}
+
+async function loadPaperAnalysisHistory() {
+  if (!state.activePaper || !state.runId) return;
+  const target = $("#paper-analysis-status");
+  try {
+    const payload = await fetchJson(`/api/papers/${encodeURIComponent(state.activePaper.id)}/analyses?run_id=${encodeURIComponent(state.runId)}`);
+    if (!payload.items.length) {
+      target.innerHTML = `<div class="empty-state">${escapeHtml(t("noAnalysisHistory"))}</div>`;
+      return;
+    }
+    target.innerHTML = `<span class="panel-kicker">${escapeHtml(t("analysisHistory"))}</span><div class="analysis-history-list">${payload.items.map((analysis) => `<button type="button" class="analysis-history-item" data-analysis-id="${escapeHtml(analysis.id)}"><strong>${escapeHtml(analysis.artifact.document_status === "full_text" ? t("fullTextScope") : t("abstractScope"))}</strong><span>${escapeHtml(new Date(analysis.created_at).toLocaleString(state.language))}</span></button>`).join("")}</div>`;
+    $$('.analysis-history-item').forEach((button) => button.addEventListener("click", async () => {
+      state.activePaperAnalysis = await fetchJson(`/api/paper-analyses/${encodeURIComponent(button.dataset.analysisId)}`);
+      renderPaperAnalysis(state.activePaperAnalysis);
+    }));
+  } catch (error) {
+    target.innerHTML = `<div class="job-error"><strong>${escapeHtml(t("analysisFailed"))}</strong><p>${escapeHtml(error.message)}</p></div>`;
+  }
+}
+
+function renderPaperAnalysisJob(job) {
+  const target = $("#paper-analysis-status");
+  if (job.status === "failed") {
+    target.innerHTML = `<div class="job-error"><strong>${escapeHtml(t("analysisFailed"))}</strong><p>${escapeHtml(job.error?.message || "Unknown error")}</p></div>`;
+    return;
+  }
+  if (job.status !== "completed") {
+    const percent = job.progress_total ? Math.round(job.progress_current / job.progress_total * 100) : 0;
+    target.innerHTML = `<div class="job-status"><strong>${escapeHtml(t("jobRunning"))}: ${escapeHtml(job.stage)}</strong><div class="progress-track"><span style="width:${percent}%"></span></div><small>${job.progress_current}/${job.progress_total}</small></div>`;
+    return;
+  }
+  const pageText = job.result.page_count ? t("documentPages", { count: job.result.page_count }) : t("abstractScope");
+  target.innerHTML = `<div class="analysis-ready"><strong>${escapeHtml(t("analysisReady"))}</strong><span>${escapeHtml(pageText)}</span></div>`;
+}
+
+async function submitPaperAnalysis(event) {
+  event.preventDefault();
+  if (!state.activePaper) {
+    showSection("papers");
+    return;
+  }
+  const button = event.currentTarget.querySelector('button[type="submit"]');
+  button.disabled = true;
+  try {
+    const created = await fetchJson("/api/paper-analyses", {
+      method: "POST",
+      body: JSON.stringify({
+        run_id: state.runId,
+        paper_id: state.activePaper.id,
+        language: state.language,
+        experience_level: $("#paper-analysis-experience").value,
+        reading_goal: $("#paper-analysis-goal").value,
+        math_depth: $("#paper-analysis-math").value,
+        compute_profile: $("#paper-analysis-compute").value,
+        prefer_full_text: $("#paper-analysis-fulltext").checked,
+        force_refresh: false,
+      }),
+    });
+    const job = await pollJob(created.job_id, renderPaperAnalysisJob);
+    if (job.status === "completed") {
+      state.activePaperAnalysis = await fetchJson(`/api/paper-analyses/${encodeURIComponent(job.result.analysis_id)}`);
+      renderPaperAnalysis(state.activePaperAnalysis);
+    }
+  } catch (error) {
+    renderPaperAnalysisJob({ status: "failed", error: { message: error.message } });
+  } finally {
+    button.disabled = !state.activePaper || !state.paperAnalysisBackendCompatible;
+  }
+}
+
+function renderPaperAnalysis(analysis) {
+  const artifact = analysis.artifact;
+  if (Number(artifact.artifact_version) !== PAPER_ANALYSIS_ARTIFACT_VERSION) {
+    $("#paper-analysis-output").innerHTML = `<div class="job-error"><strong>${escapeHtml(t("staleBackend"))}</strong></div>`;
+    return;
+  }
+  const evidenceById = Object.fromEntries(artifact.evidence.map((item) => [item.id, item]));
+  const citations = (ids) => paperEvidenceButtons(ids, evidenceById);
+  const progress = Object.fromEntries((analysis.progress || []).map((item) => [item.check_id, item]));
+  const briefEntries = [
+    artifact.quick_brief.research_question, artifact.quick_brief.motivation,
+    artifact.quick_brief.prior_gap, artifact.quick_brief.approach,
+    artifact.quick_brief.main_result, artifact.quick_brief.limitation,
+  ];
+  const brief = briefEntries.map((item) => `<article><h4>${escapeHtml(item.title)}</h4><p>${escapeHtml(item.explanation)}</p>${citations(item.evidence_ids)}</article>`).join("");
+  const route = artifact.reading_route.map((step) => `<article class="reading-route-step"><span>${String(step.order).padStart(2, "0")}</span><div><h4>${escapeHtml(step.title)}</h4><p>${escapeHtml(step.instruction)}</p><small>${escapeHtml(step.purpose)}</small>${citations(step.evidence_ids)}</div></article>`).join("");
+  const logic = artifact.logic_chain.map((step) => `<div class="logic-step"><span>${escapeHtml(step.stage)}</span><p>${escapeHtml(step.content)}</p>${citations(step.evidence_ids)}</div>`).join("");
+  const methods = artifact.method_modules.map((module, index) => `<article class="method-module"><header><span>${String(index + 1).padStart(2, "0")}</span><div><h4>${escapeHtml(module.title)}</h4><p>${escapeHtml(module.purpose)}</p></div></header><dl><div><dt>${escapeHtml(t("inputLabel"))}</dt><dd>${escapeHtml(module.input)}</dd></div><div><dt>${escapeHtml(t("processLabel"))}</dt><dd>${escapeHtml(module.process)}</dd></div><div><dt>${escapeHtml(t("outputLabel"))}</dt><dd>${escapeHtml(module.output)}</dd></div><div><dt>${escapeHtml(t("whyMatters"))}</dt><dd>${escapeHtml(module.why_it_matters)}</dd></div></dl>${citations(module.evidence_ids)}</article>`).join("");
+  const strengthKey = { supported: "strengthSupported", partial: "strengthPartial", not_shown: "strengthNotShown" };
+  const experiments = artifact.experiment_review.map((item) => `<article class="experiment-finding strength-${escapeHtml(item.strength)}"><header><span>${escapeHtml(t(strengthKey[item.strength]))}</span><h4>${escapeHtml(item.question)}</h4></header><p>${escapeHtml(item.finding)}</p><small><strong>${escapeHtml(t("caution"))}:</strong> ${escapeHtml(item.caution)}</small>${citations(item.evidence_ids)}</article>`).join("");
+  const priorityKey = { must: "knowledgeMust", just_in_time: "knowledgeJit", defer: "knowledgeDefer" };
+  const knowledge = artifact.knowledge_map.map((item) => `<details class="paper-knowledge-item priority-${escapeHtml(item.priority)}" ${item.priority === "must" ? "open" : ""}><summary><span>${escapeHtml(t(priorityKey[item.priority]))}</span><strong>${escapeHtml(item.title)}</strong></summary><div><p>${escapeHtml(item.why_needed)}</p><h5>${escapeHtml(t("learnBoundary"))}</h5>${listMarkup(item.learn)}<div class="knowledge-stop"><strong>${escapeHtml(t("stopRule"))}</strong><span>${escapeHtml(item.stop_rule)}</span></div><div class="knowledge-self-check"><strong>${escapeHtml(t("selfCheck"))}</strong><span>${escapeHtml(item.self_check)}</span></div>${citations(item.evidence_ids)}</div></details>`).join("");
+  const reproduction = artifact.reproduction_plan.map((step) => `<article class="paper-reproduction-step"><header><span>${escapeHtml(step.level)}</span><h4>${escapeHtml(step.title)}</h4><strong>${escapeHtml(t("estimatedEffort", { hours: step.estimated_hours }))}</strong></header>${listMarkup(step.actions)}<dl><div><dt>${escapeHtml(t("expectedOutput"))}</dt><dd>${escapeHtml(step.expected_output)}</dd></div><div><dt>${escapeHtml(t("successCriteria"))}</dt><dd>${escapeHtml(step.success_criteria)}</dd></div></dl>${citations(step.evidence_ids)}</article>`).join("");
+  const checks = artifact.mastery_checks.map((check) => {
+    const saved = progress[check.id];
+    return `<article class="paper-mastery-check ${saved?.status === "passed" ? "check-passed" : ""}"><header><span>${escapeHtml(saved?.status === "passed" ? t("analysisPassed") : saved ? t("analysisNeedsReview") : t("selfCheck"))}</span><h4>${escapeHtml(check.question)}</h4></header><form class="mastery-answer-form" data-check-id="${escapeHtml(check.id)}"><textarea rows="4" required placeholder="${escapeHtml(t("yourAnswer"))}">${escapeHtml(saved?.answer || "")}</textarea><button class="secondary-button" type="submit">${escapeHtml(t("submitAnswer"))}</button></form>${saved ? `<p class="mastery-feedback">${escapeHtml(saved.feedback)}</p><details><summary>${escapeHtml(t("expectedPoints"))}</summary>${listMarkup(check.expected_points)}</details>` : ""}${citations(check.evidence_ids)}</article>`;
+  }).join("");
+  const extensions = artifact.research_extensions.map((item) => `<article class="paper-extension"><h4>${escapeHtml(item.idea)}</h4><p>${escapeHtml(item.difference)}</p><dl><div><dt>${escapeHtml(t("minimumExperiment"))}</dt><dd>${escapeHtml(item.minimum_experiment)}</dd></div><div><dt>${escapeHtml(t("caution"))}</dt><dd>${escapeHtml(item.novelty_risk)}</dd></div><div><dt>${escapeHtml(t("computeProfile"))}</dt><dd>${escapeHtml(item.resource_need)}</dd></div></dl>${citations(item.evidence_ids)}</article>`).join("");
+  const typeKey = { author_statement: "evidenceAuthor", ai_synthesis: "evidenceSynthesis", needs_verification: "evidenceVerify" };
+  const evidence = artifact.evidence.map((item) => `<article id="evidence-${escapeHtml(item.id)}" class="evidence-ledger-item"><header><span>${escapeHtml(item.page > 0 ? t("pageLabel", { page: item.page }) : t("abstractLabel"))}</span><strong>${escapeHtml(item.section)}</strong><small>${escapeHtml(t(typeKey[item.evidence_type]))}</small></header><blockquote>${escapeHtml(item.excerpt)}</blockquote></article>`).join("");
+  const pdfLink = artifact.document_status === "full_text" ? `<a class="secondary-button" href="/api/paper-analyses/${encodeURIComponent(analysis.id)}/pdf" target="_blank" rel="noopener noreferrer">${escapeHtml(t("openCachedPdf"))}</a>` : "";
+  $("#paper-analysis-scope").textContent = artifact.document_status === "full_text" ? t("fullTextScope") : t("abstractScope");
+  $("#paper-analysis-output").innerHTML = `<article class="paper-analysis-hero"><div><span class="panel-kicker">${escapeHtml(artifact.document_status === "full_text" ? t("fullTextScope") : t("abstractScope"))}</span><h2>${escapeHtml(artifact.paper_title)}</h2><p>${escapeHtml(artifact.quick_brief.one_sentence)}</p></div>${pdfLink}</article>
+    <aside class="analysis-scope-note"><strong>${escapeHtml(t("scopeWarning"))}</strong><p>${escapeHtml(artifact.scope_note)}</p>${artifact.warnings.length ? listMarkup(artifact.warnings) : ""}</aside>
+    <section class="paper-analysis-block"><div class="analysis-block-heading"><span>01</span><h3>${escapeHtml(t("threeMinuteBrief"))}</h3></div><div class="quick-brief-grid">${brief}</div></section>
+    <section class="paper-analysis-block"><div class="analysis-block-heading"><span>02</span><h3>${escapeHtml(t("readingRoute"))}</h3></div><div class="reading-route">${route}</div></section>
+    <section class="paper-analysis-block"><div class="analysis-block-heading"><span>03</span><h3>${escapeHtml(t("paperLogic"))}</h3></div><div class="paper-logic-chain">${logic}</div></section>
+    <section class="paper-analysis-block"><div class="analysis-block-heading"><span>04</span><h3>${escapeHtml(t("methodBreakdown"))}</h3></div><div class="method-module-grid">${methods}</div></section>
+    <section class="paper-analysis-block"><div class="analysis-block-heading"><span>05</span><h3>${escapeHtml(t("experimentAudit"))}</h3></div><div class="experiment-audit-grid">${experiments}</div></section>
+    <section class="paper-analysis-block"><div class="analysis-block-heading"><span>06</span><h3>${escapeHtml(t("prerequisitesForPaper"))}</h3></div><div class="paper-knowledge-map">${knowledge}</div></section>
+    <section class="paper-analysis-block"><div class="analysis-block-heading"><span>07</span><h3>${escapeHtml(t("reproductionBlueprint"))}</h3></div><div class="paper-reproduction-grid">${reproduction}</div></section>
+    <section class="paper-analysis-block"><div class="analysis-block-heading"><span>08</span><h3>${escapeHtml(t("masteryTest"))}</h3></div><div class="paper-mastery-grid">${checks}</div></section>
+    <section class="paper-analysis-block"><div class="analysis-block-heading"><span>09</span><h3>${escapeHtml(t("researchExtensions"))}</h3></div><div class="paper-extension-grid">${extensions}</div></section>
+    <details class="evidence-ledger"><summary><strong>${escapeHtml(t("evidenceLedger"))}</strong><span>${artifact.evidence.length}</span></summary><div>${evidence}</div></details>`;
+  $$('.evidence-jump').forEach((button) => button.addEventListener("click", () => {
+    const item = evidenceById[button.dataset.evidenceId];
+    if (artifact.document_status === "full_text" && item?.page > 0) {
+      window.open(`/api/paper-analyses/${encodeURIComponent(analysis.id)}/pdf#page=${item.page}`, "_blank", "noopener");
+      return;
+    }
+    document.getElementById(`evidence-${button.dataset.evidenceId}`)?.scrollIntoView({ behavior: "smooth", block: "center" });
+    document.getElementById(`evidence-${button.dataset.evidenceId}`)?.classList.add("evidence-highlight");
+  }));
+  $$('.mastery-answer-form').forEach((form) => form.addEventListener("submit", submitPaperMastery));
+}
+
+async function submitPaperMastery(event) {
+  event.preventDefault();
+  const form = event.currentTarget;
+  const button = form.querySelector('button[type="submit"]');
+  button.disabled = true;
+  try {
+    state.activePaperAnalysis = await fetchJson(`/api/paper-analyses/${encodeURIComponent(state.activePaperAnalysis.id)}/checks/${encodeURIComponent(form.dataset.checkId)}`, {
+      method: "POST", body: JSON.stringify({ answer: form.querySelector("textarea").value.trim() }),
+    });
+    renderPaperAnalysis(state.activePaperAnalysis);
+  } catch (error) {
+    showError(error);
+  } finally {
+    button.disabled = false;
   }
 }
 
@@ -649,12 +821,17 @@ async function loadWorkbenchStatus() {
   ]);
   $("#local-paper-count").textContent = `${paperPayload.count.toLocaleString()} ${t("localPapers")}`;
   state.learningBackendCompatible = Number(cloud.learning_artifact_version) === LEARNING_ARTIFACT_VERSION;
+  state.paperAnalysisBackendCompatible = Number(cloud.paper_analysis_artifact_version) === PAPER_ANALYSIS_ARTIFACT_VERSION;
   $("#cloud-status").textContent = !state.learningBackendCompatible ? t("staleBackend") : cloud.provider === "mock" ? t("mockMode") : (cloud.configured ? t("cloudReady") : t("cloudMissing"));
   $("#cloud-status").classList.toggle("warning-badge", !cloud.configured || !state.learningBackendCompatible);
   const learningButton = $('#learning-plan-form button[type="submit"]');
   learningButton.disabled = !state.learningBackendCompatible;
   if (!state.learningBackendCompatible) {
     $("#learning-plan-output").innerHTML = `<div class="job-error"><strong>${escapeHtml(t("staleBackend"))}</strong><p>${escapeHtml(t("learningContractMismatch"))}</p></div>`;
+  }
+  $("#paper-analysis-submit").disabled = !state.activePaper || !state.paperAnalysisBackendCompatible;
+  if (!state.paperAnalysisBackendCompatible) {
+    $("#paper-analysis-status").innerHTML = `<div class="job-error"><strong>${escapeHtml(t("staleBackend"))}</strong></div>`;
   }
   const target = $("#saved-sources");
   target.innerHTML = sourcePayload.items.length ? sourcePayload.items.map((source) => `
@@ -857,6 +1034,8 @@ function rerenderLanguageDependentContent() {
     renderAll();
     loadPapers();
   }
+  if (state.activePaper) $("#analysis-paper-title").textContent = state.activePaper.title;
+  if (state.activePaperAnalysis) renderPaperAnalysis(state.activePaperAnalysis);
   loadWorkbenchStatus().catch(showError);
 }
 
@@ -887,6 +1066,7 @@ function bindEvents() {
   $("#paper-pull-form").addEventListener("submit", submitPaperPull);
   $("#direction-update-form").addEventListener("submit", submitDirectionUpdate);
   $("#learning-plan-form").addEventListener("submit", submitLearningPlan);
+  $("#paper-analysis-form").addEventListener("submit", submitPaperAnalysis);
   $("#paper-filters").addEventListener("submit", (event) => { event.preventDefault(); state.page = 1; loadPapers(); });
   $("#direction-filter").addEventListener("change", () => { if ($("#direction-filter").value) $("#topic-filter").value = ""; });
   $("#topic-filter").addEventListener("change", () => { if ($("#topic-filter").value) $("#direction-filter").value = ""; });

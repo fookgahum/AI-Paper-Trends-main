@@ -33,11 +33,14 @@
           <button class="nav-item" data-section="papers">
             <span class="nav-symbol" aria-hidden="true">05</span><span data-i18n="navPapers">论文浏览</span>
           </button>
+          <button class="nav-item" data-section="paper-analysis">
+            <span class="nav-symbol" aria-hidden="true">06</span><span data-i18n="navPaperAnalysis">单篇精读</span>
+          </button>
           <button class="nav-item" data-section="data">
-            <span class="nav-symbol" aria-hidden="true">06</span><span data-i18n="navData">方法与数据</span>
+            <span class="nav-symbol" aria-hidden="true">07</span><span data-i18n="navData">方法与数据</span>
           </button>
           <button class="nav-item" data-section="about">
-            <span class="nav-symbol" aria-hidden="true">07</span><span data-i18n="navAbout">关于</span>
+            <span class="nav-symbol" aria-hidden="true">08</span><span data-i18n="navAbout">关于</span>
           </button>
         </nav>
         <div class="sidebar-note">
@@ -327,6 +330,34 @@
             <span id="page-status">—</span>
             <button id="next-page" class="secondary-button" data-i18n="next">下一页</button>
           </div>
+        </section>
+
+        <section id="paper-analysis" class="page-section">
+          <div class="section-intro paper-analysis-intro">
+            <div>
+              <span class="eyebrow" data-i18n="paperAnalysisEyebrow">READ → VERIFY → REPRODUCE</span>
+              <h2 data-i18n="paperAnalysisHeading">把一篇论文变成可解释、可核查、可复现的知识</h2>
+              <p data-i18n="paperAnalysisIntro">先用三分钟抓住主线，再沿页码证据拆方法、审实验、补知识，最后形成最小复现路线。</p>
+            </div>
+            <span id="paper-analysis-scope" class="source-badge" data-i18n="noPaperSelected">尚未选择论文</span>
+          </div>
+          <div class="paper-analysis-setup">
+            <form id="paper-analysis-form" class="panel workbench-form">
+              <span class="panel-kicker" data-i18n="analysisSettings">ANALYSIS SETTINGS</span>
+              <h3 id="analysis-paper-title" data-i18n="choosePaperFirst">请先从论文浏览中选择一篇论文</h3>
+              <label><span data-i18n="readingGoal">阅读目标</span><select id="paper-analysis-goal"><option value="quick" data-i18n="goalQuick">快速理解</option><option value="deep" selected data-i18n="goalDeep">深度掌握</option><option value="reproduce" data-i18n="goalReproduce">准备复现</option></select></label>
+              <label><span data-i18n="experience">当前基础</span><select id="paper-analysis-experience"><option value="zero" data-i18n="zeroFoundation">零基础</option><option value="beginner" selected data-i18n="beginner">入门</option><option value="intermediate" data-i18n="intermediate">中等</option><option value="advanced" data-i18n="advanced">进阶</option></select></label>
+              <label><span data-i18n="mathDepth">数学解释深度</span><select id="paper-analysis-math"><option value="intuition" selected data-i18n="mathIntuition">直觉优先</option><option value="formula" data-i18n="mathFormula">公式结合</option><option value="derivation" data-i18n="mathDerivation">完整推导</option></select></label>
+              <label><span data-i18n="computeProfile">算力条件</span><select id="paper-analysis-compute"><option value="cpu_only" data-i18n="cpuOnly">纯 CPU</option><option value="single_gpu_or_cpu" selected data-i18n="singleGpu">单卡或 CPU</option><option value="multi_gpu" data-i18n="multiGpu">多卡</option><option value="cloud_flexible" data-i18n="cloudFlexible">弹性云资源</option></select></label>
+              <label class="check-label"><input id="paper-analysis-fulltext" type="checkbox" checked><span data-i18n="preferFullText">优先获取并解析公开 PDF</span></label>
+              <button id="paper-analysis-submit" class="primary-button" type="submit" disabled data-i18n="startPaperAnalysis">开始 AI 精读</button>
+              <p class="form-help" data-i18n="paperAnalysisMockHint">当前使用免费 Mock 分析；全文失败时会明确降级为摘要级分析。</p>
+            </form>
+            <article id="paper-analysis-status" class="panel workbench-result analysis-status-panel">
+              <div class="empty-state" data-i18n="paperAnalysisEmpty">从“论文浏览”打开论文详情，然后点击“AI 精读这篇论文”。</div>
+            </article>
+          </div>
+          <div id="paper-analysis-output" class="paper-analysis-output"></div>
         </section>
 
         <section id="data" class="page-section">
