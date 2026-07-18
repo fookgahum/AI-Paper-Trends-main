@@ -1,5 +1,7 @@
 "use strict";
 
+const LEARNING_ARTIFACT_VERSION = 3;
+
 const translations = {
   "zh-CN": {
     brandSubtitle: "前沿选题雷达", navOpportunities: "研究机会", navTopics: "聚类证据",
@@ -12,7 +14,7 @@ const translations = {
     directionUpdateHeading: "分析未归类论文与新方向候选", directionUpdateIntro: "这是独立的 AI 任务；只有点击后才运行。结果保存为草稿，不会自动修改正式 13 个方向。", analysisLimit: "本次最多分析", analyseNewPapers: "用 AI 分析新论文", noDirectionUpdate: "尚未运行方向更新。", mappedExisting: "映射到现有方向", candidatePapers: "候选论文", noPendingPapers: "没有等待分析的新论文", draftCandidate: "候选方向草稿",
     learningEyebrow: "LEARN → REPRODUCE → RESEARCH", learningHeading: "把前沿方向变成可执行的学习与复现路径", learningIntro: "先圈定必须掌握的知识、前置缺口和学习边界，再把知识地图投影成 7/30/90 天安排。",
     planSettings: "学习路线设置", chooseDirection: "前沿方向", duration: "时间投影", weeklyHours: "每周小时", experience: "当前基础", zeroFoundation: "零基础", beginner: "入门", intermediate: "中等", advanced: "进阶", computeProfile: "算力条件", cpuOnly: "纯 CPU", singleGpu: "单卡或 CPU", multiGpu: "多卡", cloudFlexible: "弹性云资源", generatePlan: "生成知识路线", mockHint: "学习周期只影响节奏，不改变必须掌握的知识边界。默认 mock 模式不产生费用。", noPlanYet: "选择一个方向后生成知识路线。",
-    knowledgeCurriculum: "知识课程边界", startingPoint: "起点假设", targetCapability: "最终能力", estimatedHours: "研究就绪约需", minimumHours: "读懂论文约需", availableHours: "所选周期可用", requiredNodes: "必备知识节点", optionalNodes: "可选补充", minimumPath: "先达到：结构化读论文", minimumPathHint: "这不是研究就绪；它只让你有能力开始读锚点论文。", startNow: "现在只做第一关", startNowHint: "先不要展开完整知识图，也不要急着读前沿论文。学完指定小节，亲手完成过关证据。", startResources: "第一关资料", startEvidence: "离开资料前必须做到", deferTopics: "暂时不用学", exitCriteria: "学成标准", gapDiagnosis: "前置缺口诊断（需要时展开）", currentAssumption: "当前假设", targetLevel: "需要补到", diagnosticQuestions: "先自测", masteryMilestones: "按能力关卡推进", milestoneHint: "不要按天数硬赶。只有能独立通过验收，才进入下一关。", gateChecks: "过关证据", commonFailures: "常见假掌握", linkedKnowledge: "本关知识", starterResources: "从这些可靠资料开始", resourceHint: "只学指定章节，达到停止条件就离开资料，转入练习和论文。", recommendedSections: "只学这些章节", stopRule: "停止条件", knowledgeTree: "完整分层知识地图", whyRequired: "为什么必须学", learnThese: "具体学什么", skipForNow: "边界：暂时不用学", masteryChecks: "掌握检查", resourceSearch: "方向资料检索词", prerequisites: "前置节点", planStages: "按时间安排（次要）", calendarProjection: "把知识地图投影成阶段计划", calendarHint: "先确认知识范围；只有需要执行节奏时再展开。", anchorPapers: "锚点论文（第三关使用）", reproductionLadder: "复现阶梯", researchHypotheses: "最小研究假设", researchExit: "复现与研究出口", researchExitHint: "通过论文阅读关卡后再展开，避免现在分散注意力。", deliverable: "交付物", acceptance: "验收标准", markDone: "标记完成", completed: "已完成", required: "必须掌握", paperLiteracy: "论文可读路径", optional: "可选", cloudReady: "云端已配置", mockMode: "Mock 免费测试", cloudMissing: "云端缺少 API Key", jobFailed: "任务失败", jobRunning: "任务执行中", parsedPapers: "解析", newPapers: "新增", duplicatePapers: "重复", rejectedPapers: "拒绝",
+    knowledgeCurriculum: "知识课程边界", startingPoint: "起点假设", targetCapability: "最终能力", estimatedHours: "研究就绪约需", minimumHours: "读懂论文约需", availableHours: "所选周期可用", requiredNodes: "必备知识节点", optionalNodes: "可选补充", minimumPath: "先达到：结构化读论文", minimumPathHint: "这不是研究就绪；它只让你有能力开始读锚点论文。", startNow: "现在只做第一关", startNowHint: "先不要展开完整知识图，也不要急着读前沿论文。学完指定小节，亲手完成过关证据。", startResources: "第一关资料", startEvidence: "离开资料前必须做到", deferTopics: "暂时不用学", exitCriteria: "学成标准", gapDiagnosis: "前置缺口诊断（需要时展开）", currentAssumption: "当前假设", targetLevel: "需要补到", diagnosticQuestions: "先自测", masteryMilestones: "按能力关卡推进", milestoneHint: "不要按天数硬赶。只有能独立通过验收，才进入下一关。", gateChecks: "过关证据", commonFailures: "常见假掌握", linkedKnowledge: "本关知识", starterResources: "从这些可靠资料开始", resourceHint: "只学指定章节，达到停止条件就离开资料，转入练习和论文。", recommendedSections: "只学这些章节", stopRule: "停止条件", knowledgeTree: "完整分层知识地图", whyRequired: "为什么必须学", learnThese: "具体学什么", skipForNow: "边界：暂时不用学", masteryChecks: "掌握检查", resourceSearch: "方向资料检索词", prerequisites: "前置节点", planStages: "按时间安排（次要）", calendarProjection: "把知识地图投影成阶段计划", calendarHint: "先确认知识范围；只有需要执行节奏时再展开。", anchorPapers: "锚点论文（第三关使用）", reproductionLadder: "复现阶梯", researchHypotheses: "最小研究假设", researchExit: "复现与研究出口", researchExitHint: "通过论文阅读关卡后再展开，避免现在分散注意力。", deliverable: "交付物", acceptance: "验收标准", markDone: "标记完成", completed: "已完成", required: "必须掌握", paperLiteracy: "论文可读路径", optional: "可选", cloudReady: "云端已配置", mockMode: "Mock 免费测试", cloudMissing: "云端缺少 API Key", staleBackend: "后端版本过旧，请停止并重新启动网站", learningContractMismatch: "学习计划来自旧版后端，缺少新版知识路线字段。请在运行网站的终端按 Ctrl+C，然后重新执行启动命令。", jobFailed: "任务失败", jobRunning: "任务执行中", parsedPapers: "解析", newPapers: "新增", duplicatePapers: "重复", rejectedPapers: "拒绝",
     dataset: "数据集", conference: "会议", allConferences: "全部会议", loading: "正在生成方向建议…",
     decisionCaveatTitle: "先说明“容易写”的含义", decisionCaveat: "切入友好度衡量资源匹配、可做题型和证据广度，不是录用率，也不保证论文发表。",
     heuristicBadge: "决策辅助 · 非录用预测", heroEyebrow: "ANSWER FIRST", heroTitle: "不要再看关键词串，直接看哪里值得切入",
@@ -63,7 +65,7 @@ const translations = {
     directionUpdateHeading: "Analyse unclassified papers and new direction candidates", directionUpdateIntro: "This is a separate AI task and runs only when clicked. Results stay as drafts and never alter the 13 published directions automatically.", analysisLimit: "Maximum papers", analyseNewPapers: "Analyse new papers with AI", noDirectionUpdate: "No direction update has run.", mappedExisting: "Mapped to existing directions", candidatePapers: "Candidate papers", noPendingPapers: "No new papers are waiting for analysis", draftCandidate: "Direction candidate draft",
     learningEyebrow: "LEARN → REPRODUCE → RESEARCH", learningHeading: "Turn a frontier direction into a learning and reproduction path", learningIntro: "First bound required knowledge, prerequisite gaps, and what to defer; only then project the map onto 7/30/90 days.",
     planSettings: "Curriculum settings", chooseDirection: "Frontier direction", duration: "Time projection", weeklyHours: "Hours per week", experience: "Experience", zeroFoundation: "Zero foundation", beginner: "Beginner", intermediate: "Intermediate", advanced: "Advanced", computeProfile: "Compute profile", cpuOnly: "CPU only", singleGpu: "Single GPU or CPU", multiGpu: "Multiple GPUs", cloudFlexible: "Flexible cloud", generatePlan: "Generate knowledge path", mockHint: "Duration changes pacing, not the required knowledge boundary. Mock mode is free by default.", noPlanYet: "Choose a direction and generate a knowledge path.",
-    knowledgeCurriculum: "Curriculum boundary", startingPoint: "Starting assumption", targetCapability: "Target capability", estimatedHours: "Research-ready effort", minimumHours: "Paper-literacy effort", availableHours: "Available in selected period", requiredNodes: "Required knowledge nodes", optionalNodes: "Optional additions", minimumPath: "First target: structured paper literacy", minimumPathHint: "This is not research-ready; it only makes you capable of starting the anchor papers.", startNow: "Do only Gate 1 now", startNowHint: "Do not expand the full map or rush into frontier papers yet. Use the prescribed sections, then produce the passing evidence yourself.", startResources: "Gate 1 resources", startEvidence: "Before leaving the resources, you must", deferTopics: "Defer for now", exitCriteria: "Exit criteria", gapDiagnosis: "Prerequisite gap diagnosis (expand if needed)", currentAssumption: "Current assumption", targetLevel: "Target level", diagnosticQuestions: "Self-check first", masteryMilestones: "Advance through capability gates", milestoneHint: "Do not race the calendar. Move on only after passing the checks independently.", gateChecks: "Passing evidence", commonFailures: "False-mastery traps", linkedKnowledge: "Knowledge in this gate", starterResources: "Start with these reviewed resources", resourceHint: "Use only the prescribed sections. Leave the resource as soon as the stop rule passes, then practise and read papers.", recommendedSections: "Use only these sections", stopRule: "Stop rule", knowledgeTree: "Complete layered knowledge map", whyRequired: "Why it is required", learnThese: "What to learn", skipForNow: "Boundary: defer for now", masteryChecks: "Mastery checks", resourceSearch: "Direction-resource search terms", prerequisites: "Prerequisite nodes", planStages: "Calendar projection (secondary)", calendarProjection: "Project the knowledge map onto stages", calendarHint: "Confirm the knowledge boundary first; expand this only when you need execution pacing.", anchorPapers: "Anchor papers (use at Gate 3)", reproductionLadder: "Reproduction ladder", researchHypotheses: "Minimum research hypotheses", researchExit: "Reproduction and research exit", researchExitHint: "Expand only after passing the paper-reading gate so it does not split your attention now.", deliverable: "Deliverable", acceptance: "Acceptance", markDone: "Mark done", completed: "Completed", required: "Required", paperLiteracy: "Paper-literacy path", optional: "Optional", cloudReady: "Cloud configured", mockMode: "Free mock test", cloudMissing: "Cloud API key missing", jobFailed: "Job failed", jobRunning: "Job running", parsedPapers: "Parsed", newPapers: "New", duplicatePapers: "Duplicates", rejectedPapers: "Rejected",
+    knowledgeCurriculum: "Curriculum boundary", startingPoint: "Starting assumption", targetCapability: "Target capability", estimatedHours: "Research-ready effort", minimumHours: "Paper-literacy effort", availableHours: "Available in selected period", requiredNodes: "Required knowledge nodes", optionalNodes: "Optional additions", minimumPath: "First target: structured paper literacy", minimumPathHint: "This is not research-ready; it only makes you capable of starting the anchor papers.", startNow: "Do only Gate 1 now", startNowHint: "Do not expand the full map or rush into frontier papers yet. Use the prescribed sections, then produce the passing evidence yourself.", startResources: "Gate 1 resources", startEvidence: "Before leaving the resources, you must", deferTopics: "Defer for now", exitCriteria: "Exit criteria", gapDiagnosis: "Prerequisite gap diagnosis (expand if needed)", currentAssumption: "Current assumption", targetLevel: "Target level", diagnosticQuestions: "Self-check first", masteryMilestones: "Advance through capability gates", milestoneHint: "Do not race the calendar. Move on only after passing the checks independently.", gateChecks: "Passing evidence", commonFailures: "False-mastery traps", linkedKnowledge: "Knowledge in this gate", starterResources: "Start with these reviewed resources", resourceHint: "Use only the prescribed sections. Leave the resource as soon as the stop rule passes, then practise and read papers.", recommendedSections: "Use only these sections", stopRule: "Stop rule", knowledgeTree: "Complete layered knowledge map", whyRequired: "Why it is required", learnThese: "What to learn", skipForNow: "Boundary: defer for now", masteryChecks: "Mastery checks", resourceSearch: "Direction-resource search terms", prerequisites: "Prerequisite nodes", planStages: "Calendar projection (secondary)", calendarProjection: "Project the knowledge map onto stages", calendarHint: "Confirm the knowledge boundary first; expand this only when you need execution pacing.", anchorPapers: "Anchor papers (use at Gate 3)", reproductionLadder: "Reproduction ladder", researchHypotheses: "Minimum research hypotheses", researchExit: "Reproduction and research exit", researchExitHint: "Expand only after passing the paper-reading gate so it does not split your attention now.", deliverable: "Deliverable", acceptance: "Acceptance", markDone: "Mark done", completed: "Completed", required: "Required", paperLiteracy: "Paper-literacy path", optional: "Optional", cloudReady: "Cloud configured", mockMode: "Free mock test", cloudMissing: "Cloud API key missing", staleBackend: "Backend is outdated; stop and restart the site", learningContractMismatch: "This plan came from an outdated backend and lacks the current curriculum fields. Press Ctrl+C in the terminal running the site, then run the start command again.", jobFailed: "Job failed", jobRunning: "Job running", parsedPapers: "Parsed", newPapers: "New", duplicatePapers: "Duplicates", rejectedPapers: "Rejected",
     dataset: "Dataset", conference: "Conference", allConferences: "All conferences", loading: "Building direction recommendations…",
     decisionCaveatTitle: "What “easier to enter” means", decisionCaveat: "Entry friendliness measures resource fit, viable paper shapes, and evidence breadth. It is not an acceptance rate or publication guarantee.",
     heuristicBadge: "Decision aid · not acceptance prediction", heroEyebrow: "ANSWER FIRST", heroTitle: "Move beyond keyword strings and see where to enter",
@@ -115,6 +117,7 @@ const state = {
   pageSize: 20,
   charts: {},
   activeLearningPlan: null,
+  learningBackendCompatible: true,
 };
 
 const $ = (selector) => document.querySelector(selector);
@@ -645,8 +648,14 @@ async function loadWorkbenchStatus() {
     fetchJson("/api/paper-sources"), fetchJson("/api/local/papers?limit=1"), fetchJson("/api/cloud/status"), fetchJson("/api/direction-updates?limit=1"),
   ]);
   $("#local-paper-count").textContent = `${paperPayload.count.toLocaleString()} ${t("localPapers")}`;
-  $("#cloud-status").textContent = cloud.provider === "mock" ? t("mockMode") : (cloud.configured ? t("cloudReady") : t("cloudMissing"));
-  $("#cloud-status").classList.toggle("warning-badge", !cloud.configured);
+  state.learningBackendCompatible = Number(cloud.learning_artifact_version) === LEARNING_ARTIFACT_VERSION;
+  $("#cloud-status").textContent = !state.learningBackendCompatible ? t("staleBackend") : cloud.provider === "mock" ? t("mockMode") : (cloud.configured ? t("cloudReady") : t("cloudMissing"));
+  $("#cloud-status").classList.toggle("warning-badge", !cloud.configured || !state.learningBackendCompatible);
+  const learningButton = $('#learning-plan-form button[type="submit"]');
+  learningButton.disabled = !state.learningBackendCompatible;
+  if (!state.learningBackendCompatible) {
+    $("#learning-plan-output").innerHTML = `<div class="job-error"><strong>${escapeHtml(t("staleBackend"))}</strong><p>${escapeHtml(t("learningContractMismatch"))}</p></div>`;
+  }
   const target = $("#saved-sources");
   target.innerHTML = sourcePayload.items.length ? sourcePayload.items.map((source) => `
     <div class="saved-source-row">
@@ -746,12 +755,15 @@ async function submitLearningPlan(event) {
   } catch (error) {
     renderLearningJob({ status: "failed", error: { message: error.message } });
   } finally {
-    button.disabled = false;
+    button.disabled = !state.learningBackendCompatible;
   }
 }
 
 function renderLearningPlan(plan) {
   const artifact = plan.artifact;
+  if (!artifact?.knowledge_scope?.must_learn_node_ids || !Array.isArray(artifact.knowledge_tree) || !Array.isArray(artifact.mastery_milestones) || !Array.isArray(artifact.starter_resources)) {
+    throw new Error(t("learningContractMismatch"));
+  }
   const progress = Object.fromEntries((plan.progress || []).map((item) => [item.task_id, item]));
   const scope = artifact.knowledge_scope;
   const requiredIds = new Set(scope.must_learn_node_ids);
@@ -845,6 +857,7 @@ function rerenderLanguageDependentContent() {
     renderAll();
     loadPapers();
   }
+  loadWorkbenchStatus().catch(showError);
 }
 
 function bindEvents() {

@@ -160,6 +160,7 @@ class WorkbenchApiTests(unittest.IsolatedAsyncioTestCase):
         response = await self.client.get("/api/cloud/status")
         self.assertEqual(response.json()["provider"], "mock")
         self.assertTrue(response.json()["configured"])
+        self.assertEqual(response.json()["learning_artifact_version"], 3)
 
 
 class CloudBoundaryTests(unittest.TestCase):

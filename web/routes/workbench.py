@@ -8,6 +8,8 @@ from typing import Literal, Optional
 from fastapi import APIRouter, BackgroundTasks, HTTPException, Query, Request, status
 from pydantic import AnyHttpUrl, BaseModel, Field
 
+from src.cloud_ai.schemas import LEARNING_ARTIFACT_VERSION
+
 
 class PaperPullRequest(BaseModel):
     url: AnyHttpUrl
@@ -55,6 +57,7 @@ def create_workbench_router() -> APIRouter:
             "configured": configured,
             "api_key_env": config.api_key_env,
             "prompt_version": config.prompt_version,
+            "learning_artifact_version": LEARNING_ARTIFACT_VERSION,
         }
 
     @router.post("/paper-pulls", status_code=status.HTTP_202_ACCEPTED)

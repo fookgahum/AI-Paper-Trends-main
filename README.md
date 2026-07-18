@@ -44,6 +44,8 @@ python -m uvicorn web.app:app --host 127.0.0.1 --port 8000
 
 Open `http://127.0.0.1:8000`. Docker is not required. Opening the website never starts model training. Published analysis snapshots stay in `data/web/`; local paper sources, jobs, learning progress, and generated plans stay in the Git-ignored `data/local/app.db`.
 
+After updating the code, press `Ctrl+C` in the original terminal and run the start command again; this launch mode does not reload the Python backend automatically. The current frontend checks the learning-artifact contract and gives a restart message when it detects an outdated server.
+
 ## Paper updates
 
 Use the **Paper updates** page to enter a public proceedings or JSON URL. Pulling, parsing, deduplication, and optional PDF download are independent of AI. The same workflow is available from PowerShell:

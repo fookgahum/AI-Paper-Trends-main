@@ -7,6 +7,9 @@ from typing import List
 from pydantic import BaseModel, ConfigDict, Field, model_validator
 
 
+LEARNING_ARTIFACT_VERSION = 3
+
+
 class StrictModel(BaseModel):
     model_config = ConfigDict(extra="forbid")
 
